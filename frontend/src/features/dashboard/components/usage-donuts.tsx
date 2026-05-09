@@ -111,7 +111,7 @@ function TokenWindowCard({
 	const tokenMeta = learnedTokenMeta(tokenRunway);
 
 	return (
-		<article className="group relative bg-card p-6 transition-colors duration-200 hover:bg-muted/30">
+		<article className="group relative bg-transparent p-6 transition-colors duration-200 hover:bg-card/50">
 			<div className="space-y-6">
 				<div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
 					<div className="min-w-0">
@@ -163,7 +163,7 @@ export function UsageDonuts({
 	const secondaryRemaining = secondaryCenterValue ?? secondaryItems.reduce((total, item) => total + Math.max(0, item.value), 0);
 
 	return (
-		<div className="grid grid-cols-1 xl:grid-cols-2 divide-y xl:divide-y-0 xl:divide-x divide-border/40 overflow-hidden rounded-2xl border bg-card shadow-[var(--shadow-sm)]">
+		<div className="grid grid-cols-1 xl:grid-cols-2 divide-y xl:divide-y-0 xl:divide-x divide-border/30 overflow-hidden rounded-2xl border border-border/40 bg-card/40 backdrop-blur-sm shadow-sm transition-all duration-200">
 			<TokenWindowCard
 				eyebrow="5h local window"
 				title="Short-term token runway"

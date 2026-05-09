@@ -108,7 +108,7 @@ export function RecentRequestsTable({
 
   return (
     <div className="space-y-4">
-      <div className="overflow-clip rounded-2xl border border-border/50 bg-gradient-to-b from-card/80 to-background shadow-[var(--shadow-sm)] backdrop-blur-sm">
+      <div className="overflow-clip rounded-2xl border border-border/40 bg-card/40 backdrop-blur-sm shadow-sm transition-all duration-200">
         <div className="relative overflow-x-auto">
           <Table className="min-w-[1240px] table-fixed">
             <TableHeader className="bg-muted/20">

@@ -85,7 +85,7 @@ export function AccountCard({ account, showAccountId = false, onAction }: Accoun
   const idSuffix = showAccountId ? ` | ID ${compactId}` : "";
 
   return (
-    <div className="group relative overflow-clip rounded-xl bg-card p-3.5 transition-colors duration-200 hover:bg-muted/50 motion-reduce:transition-none">
+    <div className="group relative overflow-clip rounded-xl border border-border/30 bg-background/40 shadow-inner p-3.5 transition-colors duration-200 hover:bg-card/60 motion-reduce:transition-none">
       <div className="relative">
         <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">

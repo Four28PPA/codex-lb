@@ -16,14 +16,14 @@ export type StatsGridProps = {
 
 export function StatsGrid({ stats, className }: StatsGridProps) {
   return (
-    <div className={cn("grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-border/40 overflow-hidden rounded-2xl border bg-card shadow-[var(--shadow-sm)]", className)}>
+    <div className={cn("grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-border/30 overflow-hidden rounded-2xl border border-border/40 bg-card/40 backdrop-blur-sm shadow-sm transition-all duration-200", className)}>
       {stats.map((stat, index) => {
         const Icon = stat.icon;
         const accent = ACCENT_STYLES[index % ACCENT_STYLES.length];
         return (
           <div
             key={stat.label}
-            className="group relative flex flex-col justify-between p-5 transition-colors hover:bg-muted/30"
+            className="group relative flex flex-col justify-between p-5 transition-colors hover:bg-card/50"
           >
             <div className="relative flex flex-col gap-4">
               <div className="flex items-center justify-between">

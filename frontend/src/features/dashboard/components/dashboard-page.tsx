@@ -61,7 +61,7 @@ function PostureCard({ posture }: { posture: DashboardPosture }) {
   const style = POSTURE_STYLES[posture.level];
   const Icon = style.icon;
   return (
-    <article className="group relative flex flex-col justify-between overflow-clip rounded-2xl border border-border/60 bg-gradient-to-b from-card to-background p-6 shadow-[var(--shadow-sm)] transition-all duration-300 hover:border-primary/20 hover:shadow-[var(--shadow-md)] motion-reduce:transition-none lg:col-span-4">
+    <article className="group relative flex flex-col justify-between overflow-clip rounded-2xl border border-border/40 bg-card/40 backdrop-blur-sm p-6 shadow-sm transition-all duration-300 hover:bg-card/50 hover:border-primary/20 hover:shadow-md motion-reduce:transition-none lg:col-span-4">
       <div className={cn("pointer-events-none absolute -right-20 -top-24 h-56 w-56 rounded-full bg-gradient-to-br opacity-20 blur-3xl transition-opacity duration-500 group-hover:opacity-40", style.glow)} />
       <div className="relative">
         <div className="flex items-start justify-between gap-4">
@@ -239,7 +239,7 @@ export function DashboardPage() {
               />
             </div>
             <div className="lg:col-span-4 flex flex-col">
-              <div className="flex-1 rounded-2xl border bg-card/50 p-2 shadow-[var(--shadow-sm)]">
+              <div className="flex-1 rounded-2xl border border-border/40 bg-card/40 backdrop-blur-sm p-2 shadow-sm transition-all duration-200">
                 <AccountCards accounts={overview?.accounts ?? []} onAction={handleAccountAction} />
               </div>
             </div>
