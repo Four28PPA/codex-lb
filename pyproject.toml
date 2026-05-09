@@ -48,12 +48,13 @@ dependencies = [
     "pydantic>=2.12.5",
     "pydantic-settings>=2.12.0",
     "pyotp>=2.9.0",
-    "python-multipart>=0.0.21",
+    "python-multipart>=0.0.27",
     "psycopg[binary]>=3.2.12",
     "segno>=1.6.6",
     "sqlalchemy>=2.0.45",
     "websockets>=16.0",
     "zstandard>=0.25.0",
+    "mako>=1.3.12",
 ]
 
 [project.optional-dependencies]
