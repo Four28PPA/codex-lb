@@ -66,45 +66,45 @@ export function SettingsPage() {
             </div>
           ) : null}
 
-          <div className="space-y-6">
-            <section>
-              <div className="grid gap-3 xl:grid-cols-[minmax(0,1.45fr)_minmax(24rem,0.85fr)]">
-                <RoutingSettings
-                  key={settings.openaiCacheAffinityMaxAgeSeconds}
-                  settings={settings}
-                  busy={busy}
-                  onSave={handleSave}
-                />
-                <div className="grid content-start gap-3 sm:grid-cols-2 xl:grid-cols-1">
-                  <ImportSettings settings={settings} busy={busy} onSave={handleSave} />
-                  <PasswordSettings disabled={busy} />
-                  {passwordManagementEnabled ? (
-                    <SessionSettings settings={settings} busy={busy} onSave={handleSave} />
-                  ) : null}
-                  {passwordManagementEnabled && passwordSessionActive ? (
-                    <Suspense fallback={null}>
-                      <TotpSettings settings={settings} disabled={busy} onSave={handleSave} />
-                    </Suspense>
-                  ) : null}
-                </div>
-              </div>
-            </section>
+          <div className="grid gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(24rem,1fr)] xl:grid-cols-[minmax(0,2fr)_minmax(24rem,1fr)]">
+            {/* Left Column */}
+            <div className="flex flex-col gap-6">
+              <RoutingSettings
+                key={settings.openaiCacheAffinityMaxAgeSeconds}
+                settings={settings}
+                busy={busy}
+                onSave={handleSave}
+              />
+              
+              <ApiKeysSection
+                apiKeyAuthEnabled={settings.apiKeyAuthEnabled}
+                disabled={busy}
+                onApiKeyAuthEnabledChange={(enabled) =>
+                  void handleSave(buildSettingsUpdateRequest(settings, { apiKeyAuthEnabled: enabled }))
+                }
+              />
+              
+              <StickySessionsSection />
+            </div>
 
-            <section>
-              <div className="grid gap-4 xl:grid-cols-[minmax(0,3fr)_minmax(18rem,1fr)]">
-                <ApiKeysSection
-                  apiKeyAuthEnabled={settings.apiKeyAuthEnabled}
-                  disabled={busy}
-                  onApiKeyAuthEnabledChange={(enabled) =>
-                    void handleSave(buildSettingsUpdateRequest(settings, { apiKeyAuthEnabled: enabled }))
-                  }
-                />
-                <FirewallSection />
-                <div className="xl:col-span-2">
-                  <StickySessionsSection />
-                </div>
-              </div>
-            </section>
+            {/* Right Column */}
+            <div className="flex flex-col gap-6">
+              <ImportSettings settings={settings} busy={busy} onSave={handleSave} />
+              
+              <PasswordSettings disabled={busy} />
+              
+              {passwordManagementEnabled ? (
+                <SessionSettings settings={settings} busy={busy} onSave={handleSave} />
+              ) : null}
+              
+              {passwordManagementEnabled && passwordSessionActive ? (
+                <Suspense fallback={null}>
+                  <TotpSettings settings={settings} disabled={busy} onSave={handleSave} />
+                </Suspense>
+              ) : null}
+              
+              <FirewallSection />
+            </div>
           </div>
 
           <LoadingOverlay visible={!!settings && busy} label="Saving settings..." />

@@ -139,13 +139,13 @@ export function StickySessionsSection() {
   };
 
   return (
-    <section className="space-y-3 rounded-xl border bg-card p-4 shadow-[var(--shadow-xs)]">
-      <div className="flex items-center gap-2.5">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
-          <Pin className="h-4 w-4 text-primary" aria-hidden="true" />
+    <section className="space-y-4 rounded-2xl border border-border/40 bg-card/40 p-5 shadow-sm backdrop-blur-sm transition-all duration-200 hover:bg-card/50">
+      <div className="flex items-center gap-3">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 shadow-inner">
+          <Pin className="h-5 w-5 text-primary" aria-hidden="true" />
         </div>
         <div>
-          <h3 className="text-sm font-semibold">Sticky sessions</h3>
+          <h3 className="text-sm font-semibold tracking-tight text-foreground">Sticky sessions</h3>
           <p className="text-xs text-muted-foreground">
             Inspect durable mappings and purge stale prompt-cache affinity rows.
           </p>
@@ -154,34 +154,36 @@ export function StickySessionsSection() {
 
       {mutationError ? <AlertMessage variant="error">{mutationError}</AlertMessage> : null}
 
-      <div className="grid gap-2 sm:grid-cols-2">
+      <div className="grid gap-3 sm:grid-cols-2">
         <Input
           aria-label="Filter sticky sessions by account"
           placeholder="Filter by account..."
           value={params.accountQuery}
           onChange={(event) => setAccountQuery(event.target.value)}
+          className="h-9 text-xs bg-background/50 border-border/40 shadow-inner focus-visible:bg-background transition-colors"
         />
         <Input
           aria-label="Filter sticky sessions by key"
           placeholder="Filter by key..."
           value={params.keyQuery}
           onChange={(event) => setKeyQuery(event.target.value)}
+          className="h-9 text-xs bg-background/50 border-border/40 shadow-inner focus-visible:bg-background transition-colors"
         />
       </div>
 
-      <div className="flex flex-col gap-3 rounded-lg border px-3 py-2 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-3 rounded-xl border border-border/30 bg-background/40 px-4 py-3 shadow-inner sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-1.5">
-            <span className="text-xs text-muted-foreground">Visible rows</span>
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] text-muted-foreground">Visible rows</span>
             <span className="text-sm font-medium tabular-nums">{total}</span>
           </div>
-          <div className="flex items-center gap-1.5">
-            <span className="text-xs text-muted-foreground">Stale prompt-cache</span>
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] text-muted-foreground">Stale prompt-cache</span>
             <span className="text-sm font-medium tabular-nums">{staleCount}</span>
           </div>
           {selectedCount > 0 ? (
-            <div className="flex items-center gap-1.5">
-              <span className="text-xs text-muted-foreground">Selected</span>
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] text-muted-foreground">Selected</span>
               <span className="text-sm font-medium tabular-nums">{selectedCount}</span>
             </div>
           ) : null}
@@ -191,7 +193,7 @@ export function StickySessionsSection() {
             type="button"
             size="sm"
             variant="outline"
-            className="h-8 text-xs"
+            className="h-8 text-xs bg-background/50 border-border/40 hover:bg-card/60"
             disabled={busy || !hasActiveTextFilter || total === 0}
             onClick={() => deleteFilteredDialog.show(total)}
           >
@@ -200,8 +202,8 @@ export function StickySessionsSection() {
           <Button
             type="button"
             size="sm"
-            variant="destructive"
-            className="h-8 text-xs"
+            variant="outline"
+            className="h-8 text-xs border-destructive/20 bg-destructive/10 text-destructive hover:bg-destructive/20 hover:text-destructive"
             disabled={busy || selectedCount === 0}
             onClick={() => deleteSelectedDialog.show(selectedEntries)}
           >
@@ -211,7 +213,7 @@ export function StickySessionsSection() {
             type="button"
             size="sm"
             variant="outline"
-            className="h-8 text-xs"
+            className="h-8 text-xs bg-background/50 border-border/40 hover:bg-card/60"
             disabled={busy || staleCount === 0}
             onClick={() => purgeDialog.show()}
           >

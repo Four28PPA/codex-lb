@@ -39,24 +39,24 @@ export function SessionSettings({ settings, busy, onSave }: SessionSettingsProps
     void onSave(buildSettingsUpdateRequest(settings, { dashboardSessionTtlSeconds: parsedSeconds }));
 
   return (
-    <section className="rounded-xl border bg-card p-4 shadow-[var(--shadow-xs)]">
-      <div className="space-y-3">
-        <div className="flex items-start gap-2.5">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-            <TimerReset className="h-4 w-4 text-primary" aria-hidden="true" />
+    <section className="rounded-2xl border border-border/40 bg-card/40 p-5 shadow-sm backdrop-blur-sm transition-all duration-200 hover:bg-card/50">
+      <div className="space-y-4">
+        <div className="flex items-start gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 shadow-inner">
+            <TimerReset className="h-5 w-5 text-primary" aria-hidden="true" />
           </div>
-          <div className="min-w-0">
-            <h3 className="text-sm font-semibold">Session</h3>
+          <div className="min-w-0 pt-0.5">
+            <h3 className="text-sm font-semibold tracking-tight text-foreground">Session</h3>
             <p className="text-xs text-muted-foreground">
               Password session lifetime.
             </p>
           </div>
         </div>
 
-        <div className="rounded-lg border bg-muted/25 p-3">
-          <div className="mb-2">
+        <div className="rounded-xl border border-border/30 bg-background/40 p-4 shadow-inner">
+          <div className="mb-3">
             <p className="text-sm font-medium">Dashboard lifetime</p>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-[11px] text-muted-foreground">
               New password sessions only.
             </p>
           </div>
@@ -74,7 +74,7 @@ export function SessionSettings({ settings, busy, onSave }: SessionSettingsProps
                   save();
                 }
               }}
-              className="h-8 w-24 text-xs"
+              className="h-9 w-24 text-xs bg-background/50 border-border/40 shadow-inner focus-visible:bg-background transition-colors"
               aria-label="Dashboard session lifetime"
             />
             <span className="text-xs text-muted-foreground">hours</span>
@@ -82,7 +82,7 @@ export function SessionSettings({ settings, busy, onSave }: SessionSettingsProps
               type="button"
               size="sm"
               variant="outline"
-              className="h-8 text-xs"
+              className="h-9 text-xs bg-background/50 border-border/40 hover:bg-card/60"
               disabled={busy || !changed}
               onClick={save}
             >
@@ -92,12 +92,12 @@ export function SessionSettings({ settings, busy, onSave }: SessionSettingsProps
         </div>
 
         {showInvalidInputWarning ? (
-          <div className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-xs font-medium text-destructive">
+          <div className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-[11px] font-medium text-destructive">
             Enter a whole number of hours (1 or more). Decimals such as <code>1.5</code> are not accepted.
           </div>
         ) : null}
         {showLongSessionWarning ? (
-          <div className="rounded-lg border border-amber-500/20 bg-amber-500/10 px-3 py-2 text-xs font-medium text-foreground">
+          <div className="rounded-lg border border-amber-500/20 bg-amber-500/10 px-3 py-2 text-[11px] font-medium text-amber-600 dark:text-amber-500">
             Lifetimes over 30 days keep admin sessions valid for a long time. That may be acceptable on a personal
             laptop, but it increases the impact of a leaked browser profile or stolen cookie.
           </div>

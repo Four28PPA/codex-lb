@@ -157,16 +157,16 @@ export function PasswordSettings({ disabled = false }: PasswordSettingsProps) {
   };
 
   return (
-    <section className="rounded-xl border bg-card p-4 shadow-[var(--shadow-xs)]">
-      <div className="space-y-3">
+    <section className="rounded-2xl border border-border/40 bg-card/40 p-5 shadow-sm backdrop-blur-sm transition-all duration-200 hover:bg-card/50">
+      <div className="space-y-4">
         <div className="flex items-start justify-between gap-3">
-        <div className="flex min-w-0 items-start gap-2.5">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-            <KeyRound className="h-4 w-4 text-primary" aria-hidden="true" />
+        <div className="flex min-w-0 items-start gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 shadow-inner">
+            <KeyRound className="h-5 w-5 text-primary" aria-hidden="true" />
           </div>
-          <div className="min-w-0">
-            <h3 className="text-sm font-semibold">Password</h3>
-            <p className="text-xs text-muted-foreground">
+          <div className="min-w-0 pt-0.5">
+            <h3 className="text-sm font-semibold tracking-tight text-foreground">Password</h3>
+            <p className="text-xs text-muted-foreground mt-0.5">
               {!passwordManagementEnabled
                 ? "Password login is disabled by the current dashboard auth mode."
                 : authMode === "trusted_header"
@@ -180,14 +180,14 @@ export function PasswordSettings({ disabled = false }: PasswordSettingsProps) {
           </div>
         </div>
 
-        <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
+        <div className="flex shrink-0 flex-wrap items-center justify-end gap-2 pt-1">
           {!passwordManagementEnabled ? null : passwordRequired && passwordSessionActive ? (
             <>
               <Button
                 type="button"
                 size="sm"
                 variant="outline"
-                className="h-8 text-xs"
+                className="h-8 text-xs bg-background/50 border-border/40 hover:bg-card/60"
                 disabled={lock}
                 onClick={() => setActiveDialog("change")}
               >
@@ -197,7 +197,7 @@ export function PasswordSettings({ disabled = false }: PasswordSettingsProps) {
                 type="button"
                 size="sm"
                 variant="outline"
-                className="h-8 text-xs text-destructive hover:text-destructive"
+                className="h-8 text-xs border-destructive/20 bg-destructive/10 text-destructive hover:bg-destructive/20 hover:text-destructive"
                 disabled={lock}
                 onClick={() => setActiveDialog("remove")}
               >
@@ -209,7 +209,7 @@ export function PasswordSettings({ disabled = false }: PasswordSettingsProps) {
               type="button"
               size="sm"
               variant="outline"
-              className="h-8 text-xs"
+              className="h-8 text-xs bg-background/50 border-border/40 hover:bg-card/60"
               disabled={disabled}
               onClick={() => setActiveDialog("verify")}
             >

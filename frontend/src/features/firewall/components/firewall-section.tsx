@@ -52,27 +52,27 @@ export function FirewallSection() {
   };
 
   return (
-    <section className="space-y-3 rounded-xl border bg-card p-4 shadow-[var(--shadow-xs)]">
-      <div className="flex items-center gap-2.5">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
-          <Shield className="h-4 w-4 text-primary" aria-hidden="true" />
+    <section className="space-y-4 rounded-2xl border border-border/40 bg-card/40 p-5 shadow-sm backdrop-blur-sm transition-all duration-200 hover:bg-card/50">
+      <div className="flex items-center gap-3">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 shadow-inner">
+          <Shield className="h-5 w-5 text-primary" aria-hidden="true" />
         </div>
         <div>
-          <h3 className="text-sm font-semibold">Firewall</h3>
+          <h3 className="text-sm font-semibold tracking-tight text-foreground">Firewall</h3>
           <p className="text-xs text-muted-foreground">Restrict proxy APIs to allowed client IPs.</p>
         </div>
       </div>
 
       {mutationError ? <AlertMessage variant="error">{mutationError}</AlertMessage> : null}
 
-      <div className="flex items-center gap-3 rounded-lg border px-3 py-2">
-        <div className="flex items-center gap-1.5">
-          <span className="text-xs text-muted-foreground">Mode</span>
-          <Badge variant="outline">{modeLabel(mode)}</Badge>
+      <div className="flex items-center gap-3 rounded-xl border border-border/30 bg-background/40 px-3 py-2.5 shadow-inner">
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] text-muted-foreground">Mode</span>
+          <Badge variant="outline" className="bg-background/50 border-border/40 shadow-inner">{modeLabel(mode)}</Badge>
         </div>
-        <div className="h-4 w-px bg-border" />
-        <div className="flex items-center gap-1.5">
-          <span className="text-xs text-muted-foreground">Allowed IPs</span>
+        <div className="h-4 w-px bg-border/50" />
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] text-muted-foreground">Allowed IPs</span>
           <span className="text-sm font-medium tabular-nums">{entries.length}</span>
         </div>
       </div>
@@ -87,13 +87,13 @@ export function FirewallSection() {
             }
           }}
           placeholder="127.0.0.1 or 2001:db8::1"
-          className="h-8 text-xs"
+          className="h-9 text-xs bg-background/50 border-border/40 shadow-inner focus-visible:bg-background transition-colors"
           disabled={busy}
         />
         <Button
           type="button"
           size="sm"
-          className="h-8 text-xs"
+          className="h-9 text-xs shadow-none"
           onClick={() => void handleAdd()}
           disabled={busy || !ipAddress.trim()}
         >

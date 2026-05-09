@@ -34,23 +34,23 @@ export function RoutingSettings({ settings, busy, onSave }: RoutingSettingsProps
     cacheAffinityTtlValid && parsedCacheAffinityTtl !== settings.openaiCacheAffinityMaxAgeSeconds;
 
   return (
-    <section className="rounded-xl border bg-card p-4 shadow-[var(--shadow-xs)]">
-      <div className="space-y-3">
-        <div className="flex items-start gap-2.5">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-            <Route className="h-4 w-4 text-primary" aria-hidden="true" />
+    <section className="rounded-2xl border border-border/40 bg-card/40 p-5 shadow-sm backdrop-blur-sm transition-all duration-200 hover:bg-card/50">
+      <div className="space-y-4">
+        <div className="flex items-start gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 shadow-inner">
+            <Route className="h-5 w-5 text-primary" aria-hidden="true" />
           </div>
-          <div className="min-w-0">
-            <h3 className="text-sm font-semibold">Routing</h3>
+          <div className="min-w-0 pt-0.5">
+            <h3 className="text-sm font-semibold tracking-tight text-foreground">Routing</h3>
             <p className="text-xs text-muted-foreground">Distribution, affinity, and reset bias.</p>
           </div>
         </div>
 
-        <div className="grid gap-2 sm:grid-cols-2">
-          <div className="rounded-lg border bg-muted/25 p-3">
-            <div className="mb-2">
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div className="rounded-xl border border-border/30 bg-background/40 p-4 shadow-inner">
+            <div className="mb-3">
               <p className="text-sm font-medium">Stream transport</p>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-[11px] text-muted-foreground">
                 Upstream connection mode.
               </p>
             </div>
@@ -60,10 +60,10 @@ export function RoutingSettings({ settings, busy, onSave }: RoutingSettingsProps
                 save({ upstreamStreamTransport: value as "default" | "auto" | "http" | "websocket" })
               }
             >
-              <SelectTrigger className="h-8 w-full text-xs" disabled={busy}>
+              <SelectTrigger className="h-9 w-full bg-background/50 text-xs border-border/40 shadow-inner focus-visible:bg-background transition-colors" disabled={busy}>
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent align="end">
+              <SelectContent align="end" className="rounded-xl border-border/40 shadow-md">
                 <SelectItem value="default">Server default</SelectItem>
                 <SelectItem value="auto">Auto</SelectItem>
                 <SelectItem value="http">Responses</SelectItem>
@@ -72,19 +72,19 @@ export function RoutingSettings({ settings, busy, onSave }: RoutingSettingsProps
             </Select>
           </div>
 
-          <div className="rounded-lg border bg-muted/25 p-3">
-            <div className="mb-2">
+          <div className="rounded-xl border border-border/30 bg-background/40 p-4 shadow-inner">
+            <div className="mb-3">
               <p className="text-sm font-medium">Routing strategy</p>
-              <p className="text-xs text-muted-foreground">Account selection policy.</p>
+              <p className="text-[11px] text-muted-foreground">Account selection policy.</p>
             </div>
             <Select
               value={settings.routingStrategy}
               onValueChange={(value) => save({ routingStrategy: value as "usage_weighted" | "round_robin" | "capacity_weighted" })}
             >
-              <SelectTrigger className="h-8 w-full text-xs" disabled={busy}>
+              <SelectTrigger className="h-9 w-full bg-background/50 text-xs border-border/40 shadow-inner focus-visible:bg-background transition-colors" disabled={busy}>
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent align="end">
+              <SelectContent align="end" className="rounded-xl border-border/40 shadow-md">
                 <SelectItem value="capacity_weighted">Capacity weighted</SelectItem>
                 <SelectItem value="usage_weighted">Usage weighted</SelectItem>
                 <SelectItem value="round_robin">Round robin</SelectItem>
@@ -92,10 +92,10 @@ export function RoutingSettings({ settings, busy, onSave }: RoutingSettingsProps
             </Select>
           </div>
 
-          <div className="flex items-center justify-between gap-3 rounded-lg border bg-muted/25 p-3">
+          <div className="flex items-center justify-between gap-3 rounded-xl border border-border/30 bg-background/40 p-4 shadow-inner">
             <div>
               <p className="text-sm font-medium">Sticky threads</p>
-              <p className="text-xs text-muted-foreground">Keep related requests on the same account.</p>
+              <p className="text-[11px] text-muted-foreground">Keep related requests on the same account.</p>
             </div>
             <Switch
               checked={settings.stickyThreadsEnabled}
@@ -104,10 +104,10 @@ export function RoutingSettings({ settings, busy, onSave }: RoutingSettingsProps
             />
           </div>
 
-          <div className="flex items-center justify-between gap-3 rounded-lg border bg-muted/25 p-3">
+          <div className="flex items-center justify-between gap-3 rounded-xl border border-border/30 bg-background/40 p-4 shadow-inner">
             <div>
               <p className="text-sm font-medium">Prefer earlier reset</p>
-              <p className="text-xs text-muted-foreground">Bias traffic to accounts with earlier quota reset.</p>
+              <p className="text-[11px] text-muted-foreground">Bias traffic to accounts with earlier quota reset.</p>
             </div>
             <Switch
               checked={settings.preferEarlierResetAccounts}
@@ -116,14 +116,14 @@ export function RoutingSettings({ settings, busy, onSave }: RoutingSettingsProps
             />
           </div>
 
-          <div className="rounded-lg border bg-muted/25 p-3 sm:col-span-2">
+          <div className="rounded-xl border border-border/30 bg-background/40 p-4 shadow-inner sm:col-span-2">
             <div>
               <p className="text-sm font-medium">Prompt-cache affinity TTL</p>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-[11px] text-muted-foreground">
                 Keep OpenAI-style prompt-cache mappings warm for a bounded number of seconds.
               </p>
             </div>
-            <div className="mt-2 flex items-center gap-2">
+            <div className="mt-3 flex items-center gap-2">
               <Input
                 type="number"
                 min={1}
@@ -137,13 +137,13 @@ export function RoutingSettings({ settings, busy, onSave }: RoutingSettingsProps
                     void save({ openaiCacheAffinityMaxAgeSeconds: parsedCacheAffinityTtl });
                   }
                 }}
-                className="h-8 w-28 text-xs"
+                className="h-9 w-28 text-xs bg-background/50 border-border/40 shadow-inner focus-visible:bg-background transition-colors"
               />
               <Button
                 type="button"
                 size="sm"
                 variant="outline"
-                className="h-8 text-xs"
+                className="h-9 text-xs"
                 disabled={busy || !cacheAffinityTtlChanged}
                 onClick={() => void save({ openaiCacheAffinityMaxAgeSeconds: parsedCacheAffinityTtl })}
               >

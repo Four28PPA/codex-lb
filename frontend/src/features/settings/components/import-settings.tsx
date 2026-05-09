@@ -15,14 +15,14 @@ export function ImportSettings({ settings, busy, onSave }: ImportSettingsProps) 
     void onSave(buildSettingsUpdateRequest(settings, patch));
 
   return (
-    <section className="rounded-xl border bg-card p-3 shadow-[var(--shadow-xs)]">
+    <section className="rounded-2xl border border-border/40 bg-card/40 p-5 shadow-sm backdrop-blur-sm transition-all duration-200 hover:bg-card/50">
       <div className="flex items-center justify-between gap-3">
-        <div className="flex min-w-0 items-center gap-2.5">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-            <Upload className="h-4 w-4 text-primary" aria-hidden="true" />
+        <div className="flex min-w-0 items-center gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 shadow-inner">
+            <Upload className="h-5 w-5 text-primary" aria-hidden="true" />
           </div>
-          <div className="min-w-0">
-            <h3 className="text-sm font-semibold">Import</h3>
+          <div className="min-w-0 pt-0.5">
+            <h3 className="text-sm font-semibold tracking-tight text-foreground">Import</h3>
             <p className="text-xs text-muted-foreground">Keep duplicate accounts separate.</p>
           </div>
         </div>
