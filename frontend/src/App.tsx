@@ -52,22 +52,22 @@ function DashboardHeaderControls() {
   }
 
   return (
-    <div className="hidden items-center gap-1.5 md:flex">
+    <div className="hidden items-center gap-2 md:flex">
       <OverviewTimeframeSelect
         value={overviewTimeframe}
         onChange={handleOverviewTimeframeChange}
-        className="h-8 w-16 rounded-lg bg-muted/40 px-2.5"
-        contentClassName="min-w-16"
+        className="h-9 w-[4.5rem] rounded-full border-border/50 bg-card/40 px-3 shadow-inner backdrop-blur-sm transition-all duration-200 hover:bg-card/60"
+        contentClassName="min-w-[4.5rem] rounded-xl border-border/40 shadow-md"
       />
       <button
         type="button"
         onClick={handleRefresh}
         disabled={isFetchingDashboard}
-        className="group inline-flex h-8 w-8 items-center justify-center rounded-lg border border-border/60 bg-muted/40 text-muted-foreground shadow-[var(--shadow-xs)] transition-[transform,box-shadow,border-color,background-color,color] duration-200 hover:-translate-y-0.5 hover:border-primary/25 hover:bg-primary/10 hover:text-foreground hover:shadow-[0_8px_18px_rgba(79,70,229,0.14)] focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-ring/40 focus-visible:outline-none active:translate-y-0 disabled:pointer-events-none disabled:opacity-50 motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+        className="group inline-flex h-9 w-9 items-center justify-center rounded-full border border-border/50 bg-card/40 text-muted-foreground shadow-inner backdrop-blur-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/25 hover:bg-primary/10 hover:text-foreground hover:shadow-md focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-ring/40 focus-visible:outline-none active:translate-y-0 disabled:pointer-events-none disabled:opacity-50 motion-reduce:transition-none motion-reduce:hover:translate-y-0"
         title="Refresh dashboard"
         aria-label="Refresh dashboard"
       >
-        <RefreshCw className={cn("h-3.5 w-3.5 transition-transform duration-300 group-hover:rotate-45 motion-reduce:transition-none", isFetchingDashboard && "animate-spin")} />
+        <RefreshCw className={cn("h-4 w-4 transition-transform duration-300 group-hover:rotate-45 motion-reduce:transition-none", isFetchingDashboard && "animate-spin")} />
       </button>
     </div>
   );
