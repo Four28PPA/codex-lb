@@ -28,8 +28,8 @@ export function ApiKeyCreatedDialog({ open, apiKey, onOpenChange }: ApiKeyCreate
 
         {apiKey ? (
           <div className="min-w-0 space-y-1.5">
-            <p className="text-xs font-medium text-muted-foreground">API Key</p>
-            <div className="flex min-w-0 items-center gap-2 overflow-hidden rounded-lg border bg-muted/20 px-3 py-2">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">API Key</p>
+            <div className="flex min-w-0 items-center gap-2 overflow-hidden rounded-xl border border-border/40 bg-background/50 px-3 py-2 shadow-inner">
               <p className="min-w-0 flex-1 truncate font-mono text-xs">{apiKey}</p>
               <CopyButton value={apiKey} />
             </div>

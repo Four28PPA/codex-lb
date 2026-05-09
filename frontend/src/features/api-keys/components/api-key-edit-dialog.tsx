@@ -126,108 +126,113 @@ function ApiKeyEditForm({ apiKey, busy, onSubmit, onClose }: ApiKeyEditFormProps
       <form onSubmit={form.handleSubmit(handleSubmit)}>
         <div className="grid gap-x-6 sm:grid-cols-2">
           {/* Left column — General */}
-          <div className="max-h-[55vh] space-y-3 overflow-y-auto overscroll-contain pl-1 pr-2">
-            <h4 className="sticky top-0 bg-background pb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">General</h4>
+          <div className="max-h-[55vh] space-y-4 overflow-y-auto overscroll-contain pr-2 pb-2">
+            <h4 className="sticky top-0 z-10 bg-background/95 pb-2 pt-1 backdrop-blur-sm text-[10px] font-bold tracking-[0.2em] uppercase text-muted-foreground/80">General</h4>
 
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Name</FormLabel>
-                  <FormControl>
-                    <Input {...field} autoComplete="off" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="space-y-4 rounded-xl border border-border/40 bg-card/30 p-4 shadow-sm">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem className="space-y-1.5">
+                    <FormLabel className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Name</FormLabel>
+                    <FormControl>
+                      <Input {...field} autoComplete="off" className="h-9 bg-background/50 border-border/40 shadow-inner focus-visible:bg-background transition-colors" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <div className="space-y-1">
-              <div className="text-sm font-medium">Allowed models</div>
-              <ModelMultiSelect value={selectedModels} onChange={setSelectedModels} />
-            </div>
+              <div className="space-y-1.5">
+                <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Allowed models</div>
+                <ModelMultiSelect value={selectedModels} onChange={setSelectedModels} />
+              </div>
 
-            <div className="space-y-1">
-              <div className="text-sm font-medium">Assigned accounts</div>
-              <AccountMultiSelect value={selectedAccountIds} onChange={setSelectedAccountIds} />
-            </div>
+              <div className="space-y-1.5">
+                <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Assigned accounts</div>
+                <AccountMultiSelect value={selectedAccountIds} onChange={setSelectedAccountIds} />
+              </div>
 
-            <div className="space-y-1">
-              <div className="text-sm font-medium">Enforced model</div>
-              <Input
-                value={enforcedModel}
-                onChange={(e) => setEnforcedModel(e.target.value)}
-                placeholder="e.g. gpt-5.3-codex"
-                autoComplete="off"
+              <div className="space-y-1.5">
+                <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Enforced model</div>
+                <Input
+                  value={enforcedModel}
+                  onChange={(e) => setEnforcedModel(e.target.value)}
+                  placeholder="e.g. gpt-5.3-codex"
+                  autoComplete="off"
+                  className="h-9 bg-background/50 border-border/40 shadow-inner focus-visible:bg-background transition-colors"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Enforced reasoning</div>
+                <Select value={enforcedReasoningEffort} onValueChange={setEnforcedReasoningEffort}>
+                  <SelectTrigger className="h-9 bg-background/50 border-border/40 shadow-inner focus-visible:bg-background transition-colors">
+                    <SelectValue placeholder="None" />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-xl border-border/40 shadow-md">
+                    <SelectItem value="none" className="rounded-lg">None</SelectItem>
+                    <SelectItem value="minimal" className="rounded-lg">Minimal</SelectItem>
+                    <SelectItem value="low" className="rounded-lg">Low</SelectItem>
+                    <SelectItem value="medium" className="rounded-lg">Medium</SelectItem>
+                    <SelectItem value="high" className="rounded-lg">High</SelectItem>
+                    <SelectItem value="xhigh" className="rounded-lg">XHigh</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-1.5">
+                <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Enforced service tier</div>
+                <Select value={enforcedServiceTier} onValueChange={setEnforcedServiceTier}>
+                  <SelectTrigger className="h-9 bg-background/50 border-border/40 shadow-inner focus-visible:bg-background transition-colors">
+                    <SelectValue placeholder="None" />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-xl border-border/40 shadow-md">
+                    <SelectItem value="none" className="rounded-lg">None</SelectItem>
+                    <SelectItem value="auto" className="rounded-lg">Auto</SelectItem>
+                    <SelectItem value="default" className="rounded-lg">Default</SelectItem>
+                    <SelectItem value="priority" className="rounded-lg">Priority</SelectItem>
+                    <SelectItem value="flex" className="rounded-lg">Flex</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-1.5">
+                <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Expiry</div>
+                <ExpiryPicker value={expiresAt} onChange={setExpiresAt} />
+              </div>
+
+              <FormField
+                control={form.control}
+                name="isActive"
+                render={({ field }) => (
+                  <div className="flex items-center justify-between rounded-xl border border-border/40 bg-background/50 p-3 shadow-inner">
+                    <span className="text-sm font-medium">Active</span>
+                    <Switch checked={field.value} onCheckedChange={field.onChange} />
+                  </div>
+                )}
               />
             </div>
-
-            <div className="space-y-1">
-              <div className="text-sm font-medium">Enforced reasoning</div>
-              <Select value={enforcedReasoningEffort} onValueChange={setEnforcedReasoningEffort}>
-                <SelectTrigger>
-                  <SelectValue placeholder="None" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">None</SelectItem>
-                  <SelectItem value="minimal">Minimal</SelectItem>
-                  <SelectItem value="low">Low</SelectItem>
-                  <SelectItem value="medium">Medium</SelectItem>
-                  <SelectItem value="high">High</SelectItem>
-                  <SelectItem value="xhigh">XHigh</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-1">
-              <div className="text-sm font-medium">Enforced service tier</div>
-              <Select value={enforcedServiceTier} onValueChange={setEnforcedServiceTier}>
-                <SelectTrigger>
-                  <SelectValue placeholder="None" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">None</SelectItem>
-                  <SelectItem value="auto">Auto</SelectItem>
-                  <SelectItem value="default">Default</SelectItem>
-                  <SelectItem value="priority">Priority</SelectItem>
-                  <SelectItem value="flex">Flex</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-1">
-              <div className="text-sm font-medium">Expiry</div>
-              <ExpiryPicker value={expiresAt} onChange={setExpiresAt} />
-            </div>
-
-            <FormField
-              control={form.control}
-              name="isActive"
-              render={({ field }) => (
-                <div className="flex items-center justify-between rounded-md border p-2">
-                  <span className="text-sm">Active</span>
-                  <Switch checked={field.value} onCheckedChange={field.onChange} />
-                </div>
-              )}
-            />
           </div>
 
           {/* Right column — Limits */}
-          <div className="max-h-[55vh] space-y-3 overflow-y-auto overscroll-contain pl-1 pr-2 max-sm:mt-3 max-sm:border-t max-sm:pt-3">
-            <h4 className="sticky top-0 bg-background pb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Limits</h4>
-            <LimitRulesEditor rules={limitRules} onChange={setLimitRules} />
+          <div className="max-h-[55vh] space-y-4 overflow-y-auto overscroll-contain pr-2 pb-2 max-sm:mt-3 max-sm:border-t max-sm:pt-3">
+            <h4 className="sticky top-0 z-10 bg-background/95 pb-2 pt-1 backdrop-blur-sm text-[10px] font-bold tracking-[0.2em] uppercase text-muted-foreground/80">Limits</h4>
+            <div className="space-y-4 rounded-xl border border-border/40 bg-card/30 p-4 shadow-sm">
+              <LimitRulesEditor rules={limitRules} onChange={setLimitRules} />
 
-            {apiKey.limits.length > 0 ? (
-              <div className="space-y-1">
-                <div className="text-xs font-medium text-muted-foreground">Current usage</div>
-                <div className="space-y-1">
-                  {apiKey.limits.map((limit) => (
-                    <LimitUsageBar key={limit.id} limit={limit} />
-                  ))}
+              {apiKey.limits.length > 0 ? (
+                <div className="space-y-2 pt-2 border-t border-border/40 mt-4">
+                  <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Current usage</div>
+                  <div className="space-y-2">
+                    {apiKey.limits.map((limit) => (
+                      <LimitUsageBar key={limit.id} limit={limit} />
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ) : null}
+              ) : null}
+            </div>
           </div>
         </div>
 
@@ -251,18 +256,20 @@ function LimitUsageBar({ limit }: { limit: ApiKey["limits"][number] }) {
   const modelLabel = limit.modelFilter || "all";
 
   return (
-    <div className="rounded border p-1.5">
-      <div className="flex items-center justify-between text-xs">
-        <span className="text-muted-foreground">
-          {typeLabel} ({windowLabel}, {modelLabel})
+    <div className="space-y-1.5 rounded-lg border border-border/40 bg-background/50 p-2 shadow-inner">
+      <div className="flex items-center justify-between gap-2 text-[10px] tabular-nums">
+        <span className="font-semibold text-muted-foreground uppercase tracking-wider">
+          {typeLabel} <span className="opacity-60 lowercase">({windowLabel}, {modelLabel})</span>
         </span>
-        <span className="tabular-nums">
-          {current} / {max}
+        <span className="font-bold tracking-tight text-[11px]">
+          {current} <span className="opacity-50 font-medium mx-0.5">/</span> {max}
         </span>
       </div>
-      <div className="mt-1 h-1.5 w-full rounded-full bg-muted">
+      <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted/60 shadow-inner">
         <div
-          className={`h-full rounded-full ${percent >= 90 ? "bg-destructive" : "bg-primary"}`}
+          className={`h-full rounded-full transition-all duration-500 ease-out ${
+            percent >= 90 ? "bg-red-500" : percent >= 70 ? "bg-amber-500" : "bg-primary"
+          }`}
           style={{ width: `${percent}%` }}
         />
       </div>

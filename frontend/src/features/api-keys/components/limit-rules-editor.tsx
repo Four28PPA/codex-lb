@@ -91,11 +91,11 @@ export function LimitRulesEditor({ rules, onChange }: LimitRulesEditorProps) {
   };
 
   return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <span className="text-sm font-medium">Limits</span>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between pb-1">
+        <span className="text-[11px] font-semibold uppercase tracking-wider text-foreground/80">Basic Limits</span>
         <div className="flex items-center gap-2">
-          <span className="text-xs text-muted-foreground">Advanced</span>
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Advanced</span>
           <Switch
             checked={advanced}
             onCheckedChange={setAdvanced}
@@ -104,19 +104,20 @@ export function LimitRulesEditor({ rules, onChange }: LimitRulesEditorProps) {
       </div>
 
       {!advanced ? (
-        <div className="space-y-2">
-          <div>
-            <label className="text-xs text-muted-foreground">Weekly token limit</label>
+        <div className="space-y-4">
+          <div className="space-y-1.5">
+            <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Weekly token limit</label>
             <Input
               type="number"
               min={1}
               value={weeklyTokenRule ? String(weeklyTokenRule.maxValue) : ""}
               onChange={(e) => handleBasicTokenChange(e.target.value)}
               placeholder="No limit"
+              className="h-9 bg-background/50 border-border/40 shadow-inner focus-visible:bg-background transition-colors"
             />
           </div>
-          <div>
-            <label className="text-xs text-muted-foreground">Weekly cost limit ($)</label>
+          <div className="space-y-1.5">
+            <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Weekly cost limit ($)</label>
             <Input
               type="number"
               min={0.01}
@@ -128,11 +129,12 @@ export function LimitRulesEditor({ rules, onChange }: LimitRulesEditorProps) {
               }
               onChange={(e) => handleBasicCostChange(e.target.value)}
               placeholder="No limit"
+              className="h-9 bg-background/50 border-border/40 shadow-inner focus-visible:bg-background transition-colors"
             />
           </div>
         </div>
       ) : (
-        <div className="space-y-2">
+        <div className="space-y-3">
           {rules.map((rule, index) => (
             <LimitRuleCard
               key={index}
@@ -145,14 +147,14 @@ export function LimitRulesEditor({ rules, onChange }: LimitRulesEditorProps) {
             type="button"
             variant="outline"
             size="sm"
-            className="w-full"
+            className="w-full rounded-lg border-border/60 hover:bg-muted/50 h-8"
             onClick={addRule}
           >
             <Plus className="mr-1 size-3.5" />
             Add limit rule
           </Button>
           {rules.length > 1 ? (
-            <p className="text-xs text-muted-foreground">
+            <p className="text-[10px] text-muted-foreground text-center pt-1">
               All rules are applied together (AND). A request is blocked if any limit is exceeded.
             </p>
           ) : null}
