@@ -1,4 +1,4 @@
-import { Inbox } from "lucide-react";
+import { CircleAlert, Inbox } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { isEmailLabel } from "@/components/blur-email";
@@ -6,7 +6,6 @@ import { CopyButton } from "@/components/copy-button";
 import { usePrivacyStore } from "@/hooks/use-privacy";
 import { EmptyState } from "@/components/empty-state";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -26,14 +25,8 @@ import {
 import { PaginationControls } from "@/features/dashboard/components/filters/pagination-controls";
 import type { AccountSummary, RequestLog } from "@/features/dashboard/schemas";
 import { REQUEST_STATUS_LABELS } from "@/utils/constants";
-import {
-  formatDateTimeInline,
-  formatCompactNumber,
-  formatCurrency,
-  formatModelLabel,
-  formatSlug,
-  formatTimeLong,
-} from "@/utils/formatters";
+import { cn } from "@/lib/utils";
+import { formatCompactNumber, formatCurrency, formatModelLabel, formatSlug, formatTimeLong, formatDateTimeInline } from "@/utils/formatters";
 
 const STATUS_CLASS_MAP: Record<string, string> = {
   ok: "bg-emerald-500/15 text-emerald-700 border-emerald-500/20 hover:bg-emerald-500/20 dark:text-emerald-400",
@@ -114,146 +107,131 @@ export function RecentRequestsTable({
   }
 
   return (
-    <div className="space-y-3">
-    <div className="rounded-xl border bg-card">
-      <div className="relative overflow-x-auto">
-        <Table className="min-w-[1240px] table-fixed">
-          <TableHeader>
-            <TableRow className="hover:bg-transparent">
-              <TableHead className="w-28 pl-4 text-[11px] font-medium uppercase tracking-wider text-muted-foreground/80">Time</TableHead>
-              <TableHead className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/80">Account</TableHead>
-              <TableHead className="w-24 text-[11px] font-medium uppercase tracking-wider text-muted-foreground/80">Plan</TableHead>
-              <TableHead className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/80">API Key</TableHead>
-              <TableHead className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/80">Model</TableHead>
-              <TableHead className="w-20 text-[11px] font-medium uppercase tracking-wider text-muted-foreground/80">Transport</TableHead>
-              <TableHead className="w-24 text-[11px] font-medium uppercase tracking-wider text-muted-foreground/80">Status</TableHead>
-              <TableHead className="w-24 text-right text-[11px] font-medium uppercase tracking-wider text-muted-foreground/80">Tokens</TableHead>
-              <TableHead className="w-16 text-right text-[11px] font-medium uppercase tracking-wider text-muted-foreground/80">Cost</TableHead>
-              <TableHead className="w-72 pr-4 text-[11px] font-medium uppercase tracking-wider text-muted-foreground/80">Error</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {requests.map((request) => {
-              const time = formatTimeLong(request.requestedAt);
-              const accountLabel = request.accountId ? (accountLabelMap.get(request.accountId) ?? request.accountId) : "—";
-              const isEmailLabel = !!(request.accountId && emailLabelIds.has(request.accountId));
-              const errorPreview = request.errorMessage || request.errorCode || "-";
-              const hasError = !!(request.errorCode || request.errorMessage);
-              const visibleServiceTier = request.actualServiceTier ?? request.serviceTier;
-              const showRequestedTier =
-                !!request.requestedServiceTier && request.requestedServiceTier !== visibleServiceTier;
-              const planType = request.planType?.trim().toLowerCase() || null;
-              const planLabel = planType ? formatSlug(planType) : "--";
+    <div className="space-y-4">
+      <div className="overflow-clip rounded-2xl border border-border/50 bg-gradient-to-b from-card/80 to-background shadow-[var(--shadow-sm)] backdrop-blur-sm">
+        <div className="relative overflow-x-auto">
+          <Table className="min-w-[1240px] table-fixed">
+            <TableHeader className="bg-muted/20">
+              <TableRow className="border-border/40 hover:bg-transparent">
+                <TableHead className="w-28 pl-6 h-12 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Time</TableHead>
+                <TableHead className="h-12 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Account</TableHead>
+                <TableHead className="w-24 h-12 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Plan</TableHead>
+                <TableHead className="h-12 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">API Key</TableHead>
+                <TableHead className="h-12 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Model</TableHead>
+                <TableHead className="w-20 h-12 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Transport</TableHead>
+                <TableHead className="w-24 h-12 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Status</TableHead>
+                <TableHead className="w-28 h-12 text-right text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Tokens</TableHead>
+                <TableHead className="w-20 h-12 pr-6 text-right text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Cost</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {requests.map((request) => {
+                const time = formatTimeLong(request.requestedAt);
+                const accountLabel = request.accountId ? (accountLabelMap.get(request.accountId) ?? request.accountId) : "—";
+                const isEmailLabel = !!(request.accountId && emailLabelIds.has(request.accountId));
+                const errorPreview = request.errorMessage || request.errorCode || "No error detail recorded.";
+                const hasError = !!(request.errorCode || request.errorMessage);
+                const visibleServiceTier = request.actualServiceTier ?? request.serviceTier;
+                const showRequestedTier =
+                  !!request.requestedServiceTier && request.requestedServiceTier !== visibleServiceTier;
+                const planType = request.planType?.trim().toLowerCase() || null;
+                const planLabel = planType ? formatSlug(planType) : "--";
 
-              return (
-                <TableRow key={request.requestId}>
-                  <TableCell className="pl-4 align-top">
-                    <div className="leading-tight">
-                      <div className="text-sm font-medium">{time.time}</div>
-                      <div className="text-xs text-muted-foreground">{time.date}</div>
-                    </div>
-                  </TableCell>
-                  <TableCell className="truncate align-top text-sm">
-                    {isEmailLabel && blurred ? (
-                      <span className="privacy-blur">{accountLabel}</span>
-                    ) : (
-                      accountLabel
-                    )}
-                  </TableCell>
-                  <TableCell className="align-top">
-                    {planType ? (
-                      <Badge
-                        variant="outline"
-                        className={PLAN_CLASS_MAP[planType] ?? PLAN_CLASS_MAP.free}
-                      >
-                        {planLabel}
-                      </Badge>
-                    ) : (
-                      <span className="text-xs text-muted-foreground">--</span>
-                    )}
-                  </TableCell>
-                  <TableCell className="truncate align-top text-xs text-muted-foreground">
-                    {request.apiKeyName || "--"}
-                  </TableCell>
-                  <TableCell className="truncate align-top">
-                    <div className="leading-tight">
-                      <span className="font-mono text-xs">
-                        {formatModelLabel(request.model, request.reasoningEffort, visibleServiceTier)}
-                      </span>
-                      {showRequestedTier ? (
-                        <div className="text-[11px] text-muted-foreground">
-                          Requested {request.requestedServiceTier}
-                        </div>
-                      ) : null}
-                    </div>
-                  </TableCell>
-                  <TableCell className="align-top">
-                    {request.transport ? (
-                      <Badge
-                        variant="outline"
-                        className={TRANSPORT_CLASS_MAP[request.transport] ?? TRANSPORT_CLASS_MAP.http}
-                      >
-                        {TRANSPORT_LABELS[request.transport] ?? request.transport}
-                      </Badge>
-                    ) : (
-                      <span className="text-xs text-muted-foreground">--</span>
-                    )}
-                  </TableCell>
-                  <TableCell className="align-top">
-                    <Badge
-                      variant="outline"
-                      className={STATUS_CLASS_MAP[request.status] ?? STATUS_CLASS_MAP.error}
-                    >
-                      {REQUEST_STATUS_LABELS[request.status] ?? request.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right align-top font-mono text-xs tabular-nums">
-                    <div className="leading-tight">
-                      <div>{formatCompactNumber(request.tokens)}</div>
-                      {request.cachedInputTokens != null && request.cachedInputTokens > 0 && (
-                        <div className="text-[11px] text-muted-foreground">
-                          {formatCompactNumber(request.cachedInputTokens)} Cached
-                        </div>
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-right align-top font-mono text-xs tabular-nums">
-                    {formatCurrency(request.costUsd)}
-                  </TableCell>
-                  <TableCell className="pr-4 align-top whitespace-normal">
-                    {hasError ? (
-                      <div className="space-y-2">
-                        {request.errorCode ? (
-                          <div>
-                            <Badge variant="outline" className="max-w-full font-mono text-[10px]">
-                              <span className="truncate">{request.errorCode}</span>
-                            </Badge>
-                          </div>
-                        ) : null}
-                        <p className="line-clamp-2 break-words text-xs leading-relaxed text-muted-foreground">
-                          {errorPreview}
-                        </p>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          className="h-6 px-2 text-[11px]"
-                          onClick={() => setSelectedRequest(request)}
-                        >
-                          View Details
-                        </Button>
+                return (
+                  <TableRow key={request.requestId} className="group border-border/40 transition-colors hover:bg-muted/30">
+                    <TableCell className="pl-6 py-3 align-top">
+                      <div className="flex flex-col gap-0.5">
+                        <span className="text-sm font-medium tracking-tight text-foreground">{time.time}</span>
+                        <span className="text-[11px] text-muted-foreground">{time.date}</span>
                       </div>
-                    ) : (
-                      <span className="text-xs text-muted-foreground">-</span>
-                    )}
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
+                    </TableCell>
+                    <TableCell className="truncate py-3 align-top text-sm font-medium text-foreground/90">
+                      {isEmailLabel && blurred ? (
+                        <span className="privacy-blur">{accountLabel}</span>
+                      ) : (
+                        accountLabel
+                      )}
+                    </TableCell>
+                    <TableCell className="py-3 align-top">
+                      {planType ? (
+                        <Badge
+                          variant="outline"
+                          className={cn("rounded-md px-2 py-0.5 text-[10px] font-semibold tracking-wide", PLAN_CLASS_MAP[planType] ?? PLAN_CLASS_MAP.free)}
+                        >
+                          {planLabel}
+                        </Badge>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">--</span>
+                      )}
+                    </TableCell>
+                    <TableCell className="truncate py-3 align-top text-xs font-medium text-muted-foreground group-hover:text-foreground/80 transition-colors">
+                      {request.apiKeyName || "--"}
+                    </TableCell>
+                    <TableCell className="truncate py-3 align-top">
+                      <div className="flex flex-col gap-0.5">
+                        <span className="font-mono text-xs font-medium text-foreground/90">
+                          {formatModelLabel(request.model, request.reasoningEffort, visibleServiceTier)}
+                        </span>
+                        {showRequestedTier ? (
+                          <span className="text-[10px] font-medium tracking-wide text-amber-600 dark:text-amber-400/80">
+                            Requested {request.requestedServiceTier}
+                          </span>
+                        ) : null}
+                      </div>
+                    </TableCell>
+                    <TableCell className="py-3 align-top">
+                      {request.transport ? (
+                        <Badge
+                          variant="outline"
+                          className={cn("rounded-md px-2 py-0.5 text-[10px] font-semibold", TRANSPORT_CLASS_MAP[request.transport] ?? TRANSPORT_CLASS_MAP.http)}
+                        >
+                          {TRANSPORT_LABELS[request.transport] ?? request.transport}
+                        </Badge>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">--</span>
+                      )}
+                    </TableCell>
+                    <TableCell className="py-3 align-top">
+                      <div className="flex items-center gap-2">
+                        <Badge
+                          variant="outline"
+                          className={cn("rounded-md px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider", STATUS_CLASS_MAP[request.status] ?? STATUS_CLASS_MAP.error)}
+                        >
+                          {REQUEST_STATUS_LABELS[request.status] ?? request.status}
+                        </Badge>
+                        {hasError ? (
+                          <button
+                            type="button"
+                            aria-label={`Show error details: ${errorPreview}`}
+                            title={errorPreview}
+                            className="group/error inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-red-500/25 bg-red-500/10 text-red-500 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-red-500/45 hover:bg-red-500/15 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/35"
+                            onClick={() => setSelectedRequest(request)}
+                          >
+                            <CircleAlert className="h-3.5 w-3.5 transition-transform duration-200 group-hover/error:scale-110" aria-hidden="true" />
+                          </button>
+                        ) : null}
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-right py-3 align-top font-mono text-[13px] tracking-tight text-foreground/90">
+                      <div className="flex flex-col gap-0.5 justify-end">
+                        <span className="font-semibold">{formatCompactNumber(request.tokens)}</span>
+                        {request.cachedInputTokens != null && request.cachedInputTokens > 0 && (
+                          <span className="text-[10px] font-medium text-emerald-600 dark:text-emerald-400/80 uppercase tracking-widest">
+                            {formatCompactNumber(request.cachedInputTokens)} Cached
+                          </span>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell className="pr-6 text-right py-3 align-top font-mono text-[13px] font-bold tracking-tight text-foreground">
+                      {formatCurrency(request.costUsd)}
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </div>
       </div>
-    </div>
 
       <div className="flex justify-end">
         <PaginationControls

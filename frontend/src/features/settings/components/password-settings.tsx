@@ -157,14 +157,14 @@ export function PasswordSettings({ disabled = false }: PasswordSettingsProps) {
   };
 
   return (
-    <section className="rounded-xl border bg-card p-5">
+    <section className="rounded-xl border bg-card p-4 shadow-[var(--shadow-xs)]">
       <div className="space-y-3">
-        <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
+        <div className="flex items-start justify-between gap-3">
+        <div className="flex min-w-0 items-start gap-2.5">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
             <KeyRound className="h-4 w-4 text-primary" aria-hidden="true" />
           </div>
-          <div>
+          <div className="min-w-0">
             <h3 className="text-sm font-semibold">Password</h3>
             <p className="text-xs text-muted-foreground">
               {!passwordManagementEnabled
@@ -180,7 +180,7 @@ export function PasswordSettings({ disabled = false }: PasswordSettingsProps) {
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
           {!passwordManagementEnabled ? null : passwordRequired && passwordSessionActive ? (
             <>
               <Button

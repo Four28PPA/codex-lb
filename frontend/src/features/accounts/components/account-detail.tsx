@@ -51,30 +51,33 @@ export function AccountDetail({
     : null;
   const idSuffix = showAccountId ? ` (${compactId})` : "";
 
-  return (
-    <div key={account.accountId} className="animate-fade-in-up space-y-4 rounded-xl border bg-card p-5">
-      {/* Account header */}
-      <div>
-        <h2 className="text-base font-semibold">
-          {titleIsEmail ? <><span className={blurred ? "privacy-blur" : ""}>{title}</span>{idSuffix}</> : <>{title}{!emailSubtitle ? idSuffix : ""}</>}
-        </h2>
-        {emailSubtitle ? (
-          <p className="mt-0.5 text-xs text-muted-foreground" title={showAccountId ? `Account ID ${account.accountId}` : undefined}>
-            <span className={blurred ? "privacy-blur" : ""}>{emailSubtitle}</span>{showAccountId ? ` | ID ${compactId}` : ""}
-          </p>
-        ) : null}
-      </div>
+	return (
+		<div
+			key={account.accountId}
+			className="animate-fade-in-up space-y-6 rounded-2xl border border-border/50 bg-gradient-to-b from-card/80 to-background p-6 shadow-[var(--shadow-sm)] backdrop-blur-sm"
+		>
+			{/* Account header */}
+			<div>
+				<h2 className="text-xl font-bold tracking-tight">
+					{titleIsEmail ? <><span className={blurred ? "privacy-blur" : ""}>{title}</span>{idSuffix}</> : <>{title}{!emailSubtitle ? idSuffix : ""}</>}
+				</h2>
+				{emailSubtitle ? (
+					<p className="mt-0.5 text-sm font-medium text-muted-foreground" title={showAccountId ? `Account ID ${account.accountId}` : undefined}>
+						<span className={blurred ? "privacy-blur" : ""}>{emailSubtitle}</span>{showAccountId ? ` | ID ${compactId}` : ""}
+					</p>
+				) : null}
+			</div>
 
-      <AccountUsagePanel account={account} trends={trends} />
-      <AccountTokenInfo account={account} />
-      <AccountActions
-        account={account}
-        busy={busy}
-        onPause={onPause}
-        onResume={onResume}
-        onDelete={onDelete}
-        onReauth={onReauth}
-      />
-    </div>
-  );
+			<AccountUsagePanel account={account} trends={trends} />
+			<AccountTokenInfo account={account} />
+			<AccountActions
+				account={account}
+				busy={busy}
+				onPause={onPause}
+				onResume={onResume}
+				onDelete={onDelete}
+				onReauth={onReauth}
+			/>
+		</div>
+	);
 }

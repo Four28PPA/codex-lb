@@ -52,7 +52,7 @@ export function StatusBar() {
     : "—";
 
   return (
-    <footer className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/[0.08] bg-background/50 px-4 py-2 shadow-[0_-1px_12px_rgba(0,0,0,0.06)] backdrop-blur-xl backdrop-saturate-[1.8] supports-[backdrop-filter]:bg-background/40 dark:shadow-[0_-1px_12px_rgba(0,0,0,0.25)]">
+    <footer className="fixed bottom-0 left-0 right-0 z-50 border-t bg-card/82 px-4 py-2 shadow-[var(--shadow-sm)] backdrop-blur-xl backdrop-saturate-[1.45] supports-[backdrop-filter]:bg-card/78">
       <div className="mx-auto flex w-full max-w-[1500px] flex-wrap items-center gap-x-5 gap-y-1 text-xs text-muted-foreground">
         <span className="inline-flex items-center gap-1.5">
           {isLive ? (

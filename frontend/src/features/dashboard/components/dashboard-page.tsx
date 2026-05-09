@@ -1,36 +1,123 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, type ReactNode } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useQueryClient } from "@tanstack/react-query";
-import { RefreshCw } from "lucide-react";
+import { Activity, AlertTriangle, CheckCircle2, Gauge, ShieldAlert, type LucideIcon } from "lucide-react";
 
 import { AlertMessage } from "@/components/alert-message";
+import { Badge } from "@/components/ui/badge";
 import { useAccountMutations } from "@/features/accounts/hooks/use-accounts";
 import { AccountCards } from "@/features/dashboard/components/account-cards";
 import { DashboardSkeleton } from "@/features/dashboard/components/dashboard-skeleton";
-import { OverviewTimeframeSelect } from "@/features/dashboard/components/filters/overview-timeframe-select";
 import { RequestFilters } from "@/features/dashboard/components/filters/request-filters";
 import { RecentRequestsTable } from "@/features/dashboard/components/recent-requests-table";
 import { StatsGrid } from "@/features/dashboard/components/stats-grid";
 import { UsageDonuts } from "@/features/dashboard/components/usage-donuts";
 import { useDashboard } from "@/features/dashboard/hooks/use-dashboard";
 import { useRequestLogs } from "@/features/dashboard/hooks/use-request-logs";
-import { buildDashboardView } from "@/features/dashboard/utils";
+import { buildDashboardView, type DashboardPosture } from "@/features/dashboard/utils";
 import {
-  DEFAULT_OVERVIEW_TIMEFRAME,
   parseOverviewTimeframe,
   type AccountSummary,
-  type OverviewTimeframe,
 } from "@/features/dashboard/schemas";
 import { useThemeStore } from "@/hooks/use-theme";
+import { cn } from "@/lib/utils";
 import { REQUEST_STATUS_LABELS } from "@/utils/constants";
-import { formatModelLabel, formatSlug } from "@/utils/formatters";
+import { formatModelLabel, formatRate, formatSlug } from "@/utils/formatters";
 
 const MODEL_OPTION_DELIMITER = ":::";
 
+const POSTURE_STYLES: Record<DashboardPosture["level"], {
+  icon: LucideIcon;
+  eyebrow: string;
+  badge: string;
+  glow: string;
+}> = {
+  ready: {
+    icon: CheckCircle2,
+    eyebrow: "Traffic ready",
+    badge: "border-emerald-500/25 bg-emerald-500/15 text-emerald-700 dark:text-emerald-300",
+    glow: "from-emerald-500/25 via-primary/10 to-transparent",
+  },
+  watch: {
+    icon: Gauge,
+    eyebrow: "Capacity watch",
+    badge: "border-amber-500/25 bg-amber-500/15 text-amber-700 dark:text-amber-300",
+    glow: "from-amber-500/25 via-primary/10 to-transparent",
+  },
+  blocked: {
+    icon: ShieldAlert,
+    eyebrow: "Action needed",
+    badge: "border-red-500/25 bg-red-500/15 text-red-700 dark:text-red-300",
+    glow: "from-red-500/25 via-primary/10 to-transparent",
+  },
+  monitoring: {
+    icon: Activity,
+    eyebrow: "Monitoring",
+    badge: "border-sky-500/25 bg-sky-500/15 text-sky-700 dark:text-sky-300",
+    glow: "from-sky-500/25 via-primary/10 to-transparent",
+  },
+};
+
+function PostureCard({ posture }: { posture: DashboardPosture }) {
+  const style = POSTURE_STYLES[posture.level];
+  const Icon = style.icon;
+  return (
+    <article className="group relative flex flex-col justify-between overflow-clip rounded-2xl border border-border/60 bg-gradient-to-b from-card to-background p-6 shadow-[var(--shadow-sm)] transition-all duration-300 hover:border-primary/20 hover:shadow-[var(--shadow-md)] motion-reduce:transition-none lg:col-span-4">
+      <div className={cn("pointer-events-none absolute -right-20 -top-24 h-56 w-56 rounded-full bg-gradient-to-br opacity-20 blur-3xl transition-opacity duration-500 group-hover:opacity-40", style.glow)} />
+      <div className="relative">
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0 space-y-1.5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">{style.eyebrow}</p>
+            <div className="flex flex-wrap items-center gap-2.5">
+              <h2 className="text-3xl font-bold tracking-tight">{posture.label}</h2>
+              {posture.errorRate != null && posture.errorRate > 0 && (
+                <Badge variant="outline" className={cn("h-6 rounded-full px-2 text-[10px] font-medium", style.badge)}>
+                  {formatRate(posture.errorRate)} errors
+                </Badge>
+              )}
+            </div>
+          </div>
+          <div className={cn("flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border bg-background/50 backdrop-blur-sm transition-[transform,box-shadow] duration-300 group-hover:scale-105 group-hover:shadow-[0_0_24px_rgba(79,70,229,0.18)] motion-reduce:transition-none", style.badge)}>
+            <Icon className="h-4 w-4" aria-hidden="true" />
+          </div>
+        </div>
+      </div>
+      <div className="relative mt-6">
+        <p className="text-sm text-muted-foreground">{posture.summary}</p>
+      </div>
+    </article>
+  );
+}
+
+function SectionFrame({
+  eyebrow,
+  title,
+  description,
+  children,
+  className,
+}: {
+  eyebrow: string;
+  title: string;
+  description?: string;
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <section className={cn("relative", className)}>
+      <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-primary/80">{eyebrow}</p>
+          <h2 className="mt-1 text-xl font-semibold tracking-[-0.025em]">{title}</h2>
+          {description ? <p className="mt-1 max-w-2xl text-sm text-muted-foreground">{description}</p> : null}
+        </div>
+      </div>
+      <div>{children}</div>
+    </section>
+  );
+}
+
 export function DashboardPage() {
   const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const queryClient = useQueryClient();
+  const [searchParams] = useSearchParams();
   const isDark = useThemeStore((s) => s.theme === "dark");
   const overviewTimeframe = useMemo(
     () => parseOverviewTimeframe(searchParams.get("overviewTimeframe")),
@@ -39,37 +126,17 @@ export function DashboardPage() {
   const dashboardQuery = useDashboard(overviewTimeframe);
   const { filters, logsQuery, optionsQuery, updateFilters } = useRequestLogs();
   const { resumeMutation } = useAccountMutations();
-
-  const isRefreshing = dashboardQuery.isFetching || logsQuery.isFetching;
-
-  const handleRefresh = useCallback(() => {
-    void queryClient.invalidateQueries({ queryKey: ["dashboard"] });
-  }, [queryClient]);
-
-  const handleOverviewTimeframeChange = useCallback(
-    (timeframe: OverviewTimeframe) => {
-      const next = new URLSearchParams(searchParams);
-      if (timeframe === DEFAULT_OVERVIEW_TIMEFRAME) {
-        next.delete("overviewTimeframe");
-      } else {
-        next.set("overviewTimeframe", timeframe);
-      }
-      setSearchParams(next);
-    },
-    [searchParams, setSearchParams],
-  );
-
   const handleAccountAction = useCallback(
     (account: AccountSummary, action: string) => {
       switch (action) {
         case "details":
-          navigate(`/accounts?selected=${account.accountId}`);
+          navigate(`/access/accounts?selected=${account.accountId}`);
           break;
         case "resume":
           void resumeMutation.mutateAsync(account.accountId);
           break;
         case "reauth":
-          navigate(`/accounts?selected=${account.accountId}`);
+          navigate(`/access/accounts?selected=${account.accountId}`);
           break;
       }
     },
@@ -137,106 +204,95 @@ export function DashboardPage() {
     null;
 
   return (
-    <div className="animate-fade-in-up space-y-8">
-      {/* Page header */}
-      <div className="flex items-start justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Dashboard</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Overview, account health, and recent request logs.
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <OverviewTimeframeSelect
-            value={overviewTimeframe}
-            onChange={handleOverviewTimeframeChange}
-          />
-          <button
-            type="button"
-            onClick={handleRefresh}
-            disabled={isRefreshing}
-            className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50"
-            title="Refresh dashboard"
-          >
-            <RefreshCw className={`h-4 w-4${isRefreshing ? " animate-spin" : ""}`} />
-          </button>
-        </div>
-      </div>
-
-      {errorMessage ? <AlertMessage variant="error">{errorMessage}</AlertMessage> : null}
+    <div className="space-y-8 animate-fade-in-up">
+      {errorMessage ? (
+        <AlertMessage variant="error">
+          <span className="inline-flex items-center gap-2">
+            <AlertTriangle className="h-4 w-4" aria-hidden="true" />
+            {errorMessage}
+          </span>
+        </AlertMessage>
+      ) : null}
 
       {!view ? (
         <DashboardSkeleton />
       ) : (
         <>
-          <StatsGrid stats={view.stats} />
-
-            <UsageDonuts
-              primaryItems={view.primaryUsageItems}
-              secondaryItems={view.secondaryUsageItems}
-              primaryTotal={overview?.summary.primaryWindow.capacityCredits ?? 0}
-              secondaryTotal={overview?.summary.secondaryWindow?.capacityCredits ?? 0}
-              primaryCenterValue={view.primaryTotal}
-              secondaryCenterValue={view.secondaryTotal}
-              safeLinePrimary={view.safeLinePrimary}
-              safeLineSecondary={view.safeLineSecondary}
-            />
-
-          <section className="space-y-4">
-            <div className="flex items-center gap-3">
-              <h2 className="text-[13px] font-medium uppercase tracking-wider text-muted-foreground">Accounts</h2>
-              <div className="h-px flex-1 bg-border" />
-            </div>
-            <AccountCards accounts={overview?.accounts ?? []} onAction={handleAccountAction} />
+          <section className="grid gap-4 lg:grid-cols-12">
+            <PostureCard posture={view.posture} />
+            <StatsGrid stats={view.stats} className="lg:col-span-8" />
           </section>
 
-          <section className="space-y-4">
-            <div className="flex items-center gap-3">
-              <h2 className="text-[13px] font-medium uppercase tracking-wider text-muted-foreground">Request Logs</h2>
-              <div className="h-px flex-1 bg-border" />
-            </div>
-            <RequestFilters
-              filters={filters}
-              accountOptions={accountOptions}
-              apiKeyOptions={apiKeyOptions}
-              modelOptions={modelOptions}
-              statusOptions={statusOptions}
-              onSearchChange={(search) => updateFilters({ search, offset: 0 })}
-              onTimeframeChange={(timeframe) => updateFilters({ timeframe, offset: 0 })}
-              onAccountChange={(accountIds) => updateFilters({ accountIds, offset: 0 })}
-              onApiKeyChange={(apiKeyIds) => updateFilters({ apiKeyIds, offset: 0 })}
-              onModelChange={(modelOptionsSelected) =>
-                updateFilters({ modelOptions: modelOptionsSelected, offset: 0 })
-              }
-              onStatusChange={(statuses) => updateFilters({ statuses, offset: 0 })}
-              onReset={() =>
-                updateFilters({
-                  search: "",
-                  timeframe: "all",
-                  accountIds: [],
-                  apiKeyIds: [],
-                  modelOptions: [],
-                  statuses: [],
-                  offset: 0,
-                })
-              }
-            />
-            <div className="transition-opacity duration-200">
-              <RecentRequestsTable
-                requests={view.requestLogs}
-                accounts={overview?.accounts ?? []}
-                total={logPage?.total ?? 0}
-                limit={filters.limit}
-                offset={filters.offset}
-                hasMore={logPage?.hasMore ?? false}
-                onLimitChange={(limit) => updateFilters({ limit, offset: 0 })}
-                onOffsetChange={(offset) => updateFilters({ offset })}
+          <section className="grid gap-6 lg:grid-cols-12">
+            <div className="lg:col-span-8">
+              <UsageDonuts
+                primaryItems={view.primaryUsageItems}
+                secondaryItems={view.secondaryUsageItems}
+                primaryTotal={view.primaryCapacityTotal}
+                secondaryTotal={view.secondaryCapacityTotal}
+                primaryCenterValue={view.primaryTotal}
+                secondaryCenterValue={view.secondaryTotal}
+                tokenRunwayPrimary={view.tokenRunwayPrimary}
+                tokenRunwaySecondary={view.tokenRunwaySecondary}
+                safeLinePrimary={view.safeLinePrimary}
+                safeLineSecondary={view.safeLineSecondary}
               />
             </div>
+            <div className="lg:col-span-4 flex flex-col">
+              <div className="flex-1 rounded-2xl border bg-card/50 p-2 shadow-[var(--shadow-sm)]">
+                <AccountCards accounts={overview?.accounts ?? []} onAction={handleAccountAction} />
+              </div>
+            </div>
           </section>
+
+          <SectionFrame
+            eyebrow="Request evidence"
+            title="Routing audit trail"
+            description="Filter recent traffic by account, key, model, and status while keeping request rows in a scan-friendly table."
+          >
+            <div className="space-y-4">
+              <RequestFilters
+                filters={filters}
+                accountOptions={accountOptions}
+                apiKeyOptions={apiKeyOptions}
+                modelOptions={modelOptions}
+                statusOptions={statusOptions}
+                onSearchChange={(search) => updateFilters({ search, offset: 0 })}
+                onTimeframeChange={(timeframe) => updateFilters({ timeframe, offset: 0 })}
+                onAccountChange={(accountIds) => updateFilters({ accountIds, offset: 0 })}
+                onApiKeyChange={(apiKeyIds) => updateFilters({ apiKeyIds, offset: 0 })}
+                onModelChange={(modelOptionsSelected) =>
+                  updateFilters({ modelOptions: modelOptionsSelected, offset: 0 })
+                }
+                onStatusChange={(statuses) => updateFilters({ statuses, offset: 0 })}
+                onReset={() =>
+                  updateFilters({
+                    search: "",
+                    timeframe: "all",
+                    accountIds: [],
+                    apiKeyIds: [],
+                    modelOptions: [],
+                    statuses: [],
+                    offset: 0,
+                  })
+                }
+              />
+              <div className="transition-opacity duration-200">
+                <RecentRequestsTable
+                  requests={view.requestLogs}
+                  accounts={overview?.accounts ?? []}
+                  total={logPage?.total ?? 0}
+                  limit={filters.limit}
+                  offset={filters.offset}
+                  hasMore={logPage?.hasMore ?? false}
+                  onLimitChange={(limit) => updateFilters({ limit, offset: 0 })}
+                  onOffsetChange={(offset) => updateFilters({ offset })}
+                />
+              </div>
+            </div>
+          </SectionFrame>
         </>
       )}
-
     </div>
   );
 }

@@ -8,14 +8,11 @@ describe("useTimeFormatStore", () => {
     useTimeFormatStore.setState({ timeFormat: "12h" });
   });
 
-  it("defaults to 12h", () => {
+  it("always uses 12h", () => {
+    useTimeFormatStore.getState().setTimeFormat();
+
     expect(getTimeFormatPreference()).toBe("12h");
-  });
-
-  it("persists updates to localStorage", () => {
-    useTimeFormatStore.getState().setTimeFormat("24h");
-
-    expect(getTimeFormatPreference()).toBe("24h");
-    expect(window.localStorage.getItem("codex-lb-time-format")).toBe("24h");
+    expect(useTimeFormatStore.getState().timeFormat).toBe("12h");
+    expect(window.localStorage.getItem("codex-lb-time-format")).toBeNull();
   });
 });

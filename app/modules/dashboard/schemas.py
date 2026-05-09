@@ -54,6 +54,22 @@ class DepletionResponse(DashboardModel):
     seconds_until_exhaustion: float | None = None
 
 
+class TokenRunwayEstimateResponse(DashboardModel):
+    window_key: str
+    estimated_tokens_remaining: int | None = None
+    tokens_per_credit: float | None = None
+    observed_tokens: int
+    observed_credit_delta: float
+    samples: int
+    confidence: Literal["learning", "low", "medium", "high"]
+    last_learned_at: datetime | None = None
+
+
+class DashboardTokenRunway(DashboardModel):
+    primary: TokenRunwayEstimateResponse | None = None
+    secondary: TokenRunwayEstimateResponse | None = None
+
+
 class DashboardOverviewResponse(DashboardModel):
     last_sync_at: datetime | None = None
     timeframe: DashboardOverviewTimeframe
@@ -61,5 +77,6 @@ class DashboardOverviewResponse(DashboardModel):
     summary: DashboardOverviewSummary
     windows: DashboardUsageWindows
     trends: MetricsTrends
+    token_runway: DashboardTokenRunway | None = None
     depletion_primary: DepletionResponse | None = None
     depletion_secondary: DepletionResponse | None = None

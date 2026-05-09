@@ -36,51 +36,52 @@ export function RequestFilters({
   onReset,
 }: RequestFiltersProps) {
   return (
-    <div className="space-y-2 rounded-xl border bg-card p-4">
-      <div className="flex items-center gap-2">
-        <div className="relative min-w-0 flex-1">
-          <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground/60" aria-hidden="true" />
-          <Input
-            value={filters.search}
-            onChange={(event) => onSearchChange(event.target.value)}
-            className="h-8 pl-9"
-            placeholder="Search request id, account, API key, model, error..."
-          />
+    <div className="rounded-xl border border-border/40 bg-card/30 p-2 shadow-[var(--shadow-xs)] backdrop-blur-md transition-colors hover:bg-card/50">
+      <div className="grid items-center gap-2 lg:grid-cols-[minmax(16rem,0.8fr)_minmax(0,1.2fr)]">
+        <div className="flex min-w-0 items-center gap-2">
+          <div className="relative min-w-0 flex-1">
+            <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground/60" aria-hidden="true" />
+            <Input
+              value={filters.search}
+              onChange={(event) => onSearchChange(event.target.value)}
+              className="h-8 pl-9 border-border/40 bg-background/50 shadow-none focus-visible:ring-1 focus-visible:bg-background transition-colors hover:border-border/80"
+              placeholder="Search requests..."
+            />
+          </div>
+          <TimeframeSelect value={filters.timeframe} onChange={onTimeframeChange} />
         </div>
 
-        <TimeframeSelect value={filters.timeframe} onChange={onTimeframeChange} />
-      </div>
+        <div className="flex min-w-0 flex-wrap items-center justify-start gap-2 lg:justify-end">
+          <MultiSelectFilter
+            label="Accounts"
+            values={filters.accountIds}
+            options={accountOptions}
+            onChange={onAccountChange}
+          />
+          <MultiSelectFilter
+            label="API Keys"
+            values={filters.apiKeyIds}
+            options={apiKeyOptions}
+            onChange={onApiKeyChange}
+          />
+          <MultiSelectFilter
+            label="Models"
+            values={filters.modelOptions}
+            options={modelOptions}
+            onChange={onModelChange}
+          />
+          <MultiSelectFilter
+            label="Statuses"
+            values={filters.statuses}
+            options={statusOptions}
+            onChange={onStatusChange}
+          />
 
-      <div className="flex flex-wrap items-center gap-2">
-        <MultiSelectFilter
-          label="Accounts"
-          values={filters.accountIds}
-          options={accountOptions}
-          onChange={onAccountChange}
-        />
-        <MultiSelectFilter
-          label="API Keys"
-          values={filters.apiKeyIds}
-          options={apiKeyOptions}
-          onChange={onApiKeyChange}
-        />
-        <MultiSelectFilter
-          label="Models"
-          values={filters.modelOptions}
-          options={modelOptions}
-          onChange={onModelChange}
-        />
-        <MultiSelectFilter
-          label="Statuses"
-          values={filters.statuses}
-          options={statusOptions}
-          onChange={onStatusChange}
-        />
-
-        <Button type="button" variant="ghost" size="sm" onClick={onReset} className="h-8 gap-1.5 text-xs text-muted-foreground">
-          <RotateCcw className="h-3 w-3" aria-hidden="true" />
-          Reset
-        </Button>
+          <Button type="button" variant="ghost" size="sm" onClick={onReset} className="h-8 gap-1.5 px-2 text-xs font-medium text-muted-foreground hover:text-foreground">
+            <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
+            Reset
+          </Button>
+        </div>
       </div>
     </div>
   );

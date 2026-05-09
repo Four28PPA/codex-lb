@@ -19,8 +19,8 @@ describe("UsageDonuts", () => {
       />,
     );
 
-    expect(screen.getByText("5h Remaining")).toBeInTheDocument();
-    expect(screen.getByText("Weekly Remaining")).toBeInTheDocument();
+    expect(screen.getByText("Short-term token runway")).toBeInTheDocument();
+    expect(screen.getByText("Weekly token runway")).toBeInTheDocument();
     expect(screen.getByText("primary@example.com")).toBeInTheDocument();
     expect(screen.getByText("secondary@example.com")).toBeInTheDocument();
   });
@@ -35,9 +35,9 @@ describe("UsageDonuts", () => {
       />,
     );
 
-    expect(screen.getByText("5h Remaining")).toBeInTheDocument();
-    expect(screen.getByText("Weekly Remaining")).toBeInTheDocument();
-    expect(screen.getAllByText("Remaining").length).toBeGreaterThanOrEqual(2);
+    expect(screen.getByText("Short-term token runway")).toBeInTheDocument();
+    expect(screen.getByText("Weekly token runway")).toBeInTheDocument();
+    expect(screen.getAllByText("Tokens left").length).toBeGreaterThanOrEqual(2);
   });
 
   it("renders safe line only for the primary donut", () => {
@@ -95,7 +95,54 @@ describe("UsageDonuts", () => {
       />,
     );
 
-    const centerValues = Array.from(container.querySelectorAll(".text-base.font-semibold.tabular-nums")).map((node) => node.textContent);
+    const centerValues = [...container.querySelectorAll<HTMLElement>(".text-2xl.font-semibold.tabular-nums")]
+      .filter((node) => node.closest(".relative")?.className.includes("h-[192px]"))
+      .map((node) => node.textContent);
     expect(centerValues).toEqual(["120", "80"]);
+  });
+
+  it("renders token totals without repeated credit metric cards", () => {
+    render(
+      <UsageDonuts
+        primaryItems={[item({ accountId: "acc-1", label: "primary@example.com", value: 105.75, remainingPercent: 47, color: "#7bb661" })]}
+        secondaryItems={[item({ accountId: "acc-2", label: "secondary@example.com", value: 4536, remainingPercent: 60, color: "#d9a441" })]}
+        primaryTotal={225}
+        secondaryTotal={7560}
+        primaryCenterValue={105.75}
+        secondaryCenterValue={4536}
+        tokenRunwayPrimary={{
+          windowKey: "primary",
+          estimatedTokensRemaining: 1_200_000,
+          tokensPerCredit: 10_000,
+          observedTokens: 3_000_000,
+          observedCreditDelta: 300,
+          samples: 3,
+          confidence: "medium",
+          lastLearnedAt: "2026-01-01T00:00:00Z",
+        }}
+        tokenRunwaySecondary={{
+          windowKey: "secondary",
+          estimatedTokensRemaining: 45_360_000,
+          tokensPerCredit: 10_000,
+          observedTokens: 20_000_000,
+          observedCreditDelta: 2_000,
+          samples: 1,
+          confidence: "low",
+          lastLearnedAt: "2026-01-01T00:00:00Z",
+        }}
+      />,
+    );
+
+    expect(screen.queryByText("Credits left")).not.toBeInTheDocument();
+    expect(screen.queryByText("Credits used")).not.toBeInTheDocument();
+    expect(screen.getAllByText("Tokens left")).toHaveLength(4);
+    expect(screen.getAllByText("1.2M").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("45.36M").length).toBeGreaterThanOrEqual(1);
+    expect(screen.queryByText("Learning")).not.toBeInTheDocument();
+    expect(screen.getByText("medium confidence · 3 intervals")).toBeInTheDocument();
+    expect(screen.getByText("low confidence · 1 interval")).toBeInTheDocument();
+    expect(screen.getAllByText("Tokens used vs tokens left")).toHaveLength(2);
+    expect(screen.queryByText("105.75")).not.toBeInTheDocument();
+    expect(screen.queryByText("4.54K")).not.toBeInTheDocument();
   });
 });

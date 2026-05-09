@@ -52,7 +52,7 @@ export function FirewallSection() {
   };
 
   return (
-    <section className="space-y-3 rounded-xl border bg-card p-5">
+    <section className="space-y-3 rounded-xl border bg-card p-4 shadow-[var(--shadow-xs)]">
       <div className="flex items-center gap-2.5">
         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
           <Shield className="h-4 w-4 text-primary" aria-hidden="true" />

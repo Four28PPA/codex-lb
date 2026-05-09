@@ -17,7 +17,7 @@ describe("accounts flow integration", () => {
     expect(screen.getByText("secondary@example.com")).toBeInTheDocument();
 
     await user.click(screen.getByText("secondary@example.com"));
-    expect(await screen.findByText("Token Status")).toBeInTheDocument();
+    expect(await screen.findAllByText("Access")).toHaveLength(2);
 
     const resumeButton = screen.queryByRole("button", { name: "Resume" });
     if (resumeButton) {

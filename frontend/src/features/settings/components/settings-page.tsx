@@ -6,7 +6,6 @@ import { LoadingOverlay } from "@/components/layout/loading-overlay";
 import { ApiKeysSection } from "@/features/api-keys/components/api-keys-section";
 import { FirewallSection } from "@/features/firewall/components/firewall-section";
 import { buildSettingsUpdateRequest } from "@/features/settings/payload";
-import { AppearanceSettings } from "@/features/settings/components/appearance-settings";
 import { ImportSettings } from "@/features/settings/components/import-settings";
 import { PasswordSettings } from "@/features/settings/components/password-settings";
 import { RoutingSettings } from "@/features/settings/components/routing-settings";
@@ -67,34 +66,45 @@ export function SettingsPage() {
             </div>
           ) : null}
 
-          <div className="space-y-4">
-            <AppearanceSettings />
-            <RoutingSettings
-              key={settings.openaiCacheAffinityMaxAgeSeconds}
-              settings={settings}
-              busy={busy}
-              onSave={handleSave}
-            />
-            <ImportSettings settings={settings} busy={busy} onSave={handleSave} />
-            <PasswordSettings disabled={busy} />
-            {passwordManagementEnabled ? (
-              <SessionSettings settings={settings} busy={busy} onSave={handleSave} />
-            ) : null}
-            {passwordManagementEnabled && passwordSessionActive ? (
-              <Suspense fallback={null}>
-                <TotpSettings settings={settings} disabled={busy} onSave={handleSave} />
-              </Suspense>
-            ) : null}
+          <div className="space-y-6">
+            <section>
+              <div className="grid gap-3 xl:grid-cols-[minmax(0,1.45fr)_minmax(24rem,0.85fr)]">
+                <RoutingSettings
+                  key={settings.openaiCacheAffinityMaxAgeSeconds}
+                  settings={settings}
+                  busy={busy}
+                  onSave={handleSave}
+                />
+                <div className="grid content-start gap-3 sm:grid-cols-2 xl:grid-cols-1">
+                  <ImportSettings settings={settings} busy={busy} onSave={handleSave} />
+                  <PasswordSettings disabled={busy} />
+                  {passwordManagementEnabled ? (
+                    <SessionSettings settings={settings} busy={busy} onSave={handleSave} />
+                  ) : null}
+                  {passwordManagementEnabled && passwordSessionActive ? (
+                    <Suspense fallback={null}>
+                      <TotpSettings settings={settings} disabled={busy} onSave={handleSave} />
+                    </Suspense>
+                  ) : null}
+                </div>
+              </div>
+            </section>
 
-            <ApiKeysSection
-              apiKeyAuthEnabled={settings.apiKeyAuthEnabled}
-              disabled={busy}
-              onApiKeyAuthEnabledChange={(enabled) =>
-                void handleSave(buildSettingsUpdateRequest(settings, { apiKeyAuthEnabled: enabled }))
-              }
-            />
-            <FirewallSection />
-            <StickySessionsSection />
+            <section>
+              <div className="grid gap-4 xl:grid-cols-[minmax(0,3fr)_minmax(18rem,1fr)]">
+                <ApiKeysSection
+                  apiKeyAuthEnabled={settings.apiKeyAuthEnabled}
+                  disabled={busy}
+                  onApiKeyAuthEnabledChange={(enabled) =>
+                    void handleSave(buildSettingsUpdateRequest(settings, { apiKeyAuthEnabled: enabled }))
+                  }
+                />
+                <FirewallSection />
+                <div className="xl:col-span-2">
+                  <StickySessionsSection />
+                </div>
+              </div>
+            </section>
           </div>
 
           <LoadingOverlay visible={!!settings && busy} label="Saving settings..." />

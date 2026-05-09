@@ -36,7 +36,11 @@ const ApiKeyCreatedDialog = lazy(() =>
 	})),
 );
 
-export function ApisPage() {
+export type ApisPageProps = {
+	embedded?: boolean;
+};
+
+export function ApisPage({ embedded = false }: ApisPageProps) {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const {
 		apiKeysQuery,
@@ -107,13 +111,15 @@ export function ApisPage() {
 	};
 
 	return (
-		<div className="animate-fade-in-up space-y-6">
-			<div>
-				<h1 className="text-2xl font-semibold tracking-tight">APIs</h1>
-				<p className="mt-1 text-sm text-muted-foreground">
-					Manage API keys for client access and usage monitoring.
-				</p>
-			</div>
+		<div className="space-y-4">
+			{!embedded ? (
+				<div>
+					<h1 className="text-2xl font-semibold tracking-tight">APIs</h1>
+					<p className="mt-1 text-sm text-muted-foreground">
+						Manage API keys for client access and usage monitoring.
+					</p>
+				</div>
+			) : null}
 
 			{pageError ? (
 				<AlertMessage variant="error">{pageError}</AlertMessage>
@@ -139,14 +145,16 @@ export function ApisPage() {
 					</Button>
 				</div>
 			) : (
-				<div className="grid gap-4 lg:grid-cols-[22rem_minmax(0,1fr)]">
-					<div className="rounded-xl border bg-card p-4">
-						<ApiList
-							apiKeys={apiKeys}
-							selectedKeyId={resolvedSelectedKeyId}
-							onSelect={handleSelectKey}
-							onOpenCreate={() => createDialog.show()}
-						/>
+				<div className="grid gap-6 lg:grid-cols-[20rem_minmax(0,1fr)] items-start">
+					<div className="sticky top-[7rem]">
+						<div className="rounded-2xl border border-border/40 bg-card/40 p-4 shadow-sm backdrop-blur-sm">
+							<ApiList
+								apiKeys={apiKeys}
+								selectedKeyId={resolvedSelectedKeyId}
+								onSelect={handleSelectKey}
+								onOpenCreate={() => createDialog.show()}
+							/>
+						</div>
 					</div>
 
 					<ApiDetail

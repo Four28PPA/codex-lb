@@ -58,7 +58,7 @@ describe("auth flow integration", () => {
 
     // Auto-submit triggers on 6-digit completion via onComplete
     await waitFor(() => {
-      expect(screen.getByRole("heading", { name: "Dashboard" })).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: "Routing audit trail" })).toBeInTheDocument();
     });
   });
 });

@@ -79,6 +79,22 @@ export const DepletionSchema = z.object({
   secondsUntilExhaustion: z.number().nullable().optional(),
 });
 
+export const TokenRunwayEstimateSchema = z.object({
+  windowKey: z.string(),
+  estimatedTokensRemaining: z.number().int().nonnegative().nullable(),
+  tokensPerCredit: z.number().nullable(),
+  observedTokens: z.number().int().nonnegative(),
+  observedCreditDelta: z.number().nonnegative(),
+  samples: z.number().int().nonnegative(),
+  confidence: z.enum(["learning", "low", "medium", "high"]),
+  lastLearnedAt: z.string().datetime({ offset: true }).nullable(),
+});
+
+export const TokenRunwaySchema = z.object({
+  primary: TokenRunwayEstimateSchema.nullable().optional(),
+  secondary: TokenRunwayEstimateSchema.nullable().optional(),
+});
+
 export const DashboardOverviewSchema = z.object({
   lastSyncAt: z.string().datetime({ offset: true }).nullable(),
   timeframe: DashboardOverviewTimeframeSchema,
@@ -95,6 +111,7 @@ export const DashboardOverviewSchema = z.object({
   }),
   trends: MetricsTrendsSchema,
   additionalQuotas: z.array(AccountAdditionalQuotaSchema).default([]),
+  tokenRunway: TokenRunwaySchema.nullable().optional(),
   depletionPrimary: DepletionSchema.nullable().optional(),
   depletionSecondary: DepletionSchema.nullable().optional(),
 });
@@ -162,6 +179,7 @@ export type DashboardOverviewTimeframe = z.infer<typeof DashboardOverviewTimefra
 export type TrendPoint = z.infer<typeof TrendPointSchema>;
 export type MetricsTrends = z.infer<typeof MetricsTrendsSchema>;
 export type UsageWindow = z.infer<typeof UsageWindowSchema>;
+export type TokenRunwayEstimate = z.infer<typeof TokenRunwayEstimateSchema>;
 export type RequestLog = z.infer<typeof RequestLogSchema>;
 export type RequestLogsResponse = z.infer<typeof RequestLogsResponseSchema>;
 export type RequestLogFilterOptions = z.infer<typeof RequestLogFilterOptionsSchema>;

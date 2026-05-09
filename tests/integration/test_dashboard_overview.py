@@ -86,6 +86,10 @@ async def test_dashboard_overview_combines_data(async_client, db_setup):
     assert payload["summary"]["metrics"]["errorCount"] == 0
     assert payload["windows"]["primary"]["windowKey"] == "primary"
     assert payload["windows"]["secondary"]["windowKey"] == "secondary"
+    assert payload["tokenRunway"]["primary"]["confidence"] == "learning"
+    assert payload["tokenRunway"]["primary"]["estimatedTokensRemaining"] is None
+    assert payload["tokenRunway"]["secondary"]["confidence"] == "learning"
+    assert payload["tokenRunway"]["secondary"]["estimatedTokensRemaining"] is None
     assert "requestLogs" not in payload
     assert payload["lastSyncAt"] == secondary_time.isoformat() + "Z"
 
@@ -308,6 +312,57 @@ async def test_dashboard_overview_respects_selected_timeframe(
     else:
         assert payload["summary"]["metrics"]["errorCount"] == 1
         assert payload["summary"]["metrics"]["topError"] == "rate_limit_exceeded"
+
+
+@pytest.mark.asyncio
+async def test_dashboard_overview_returns_learned_token_runway(async_client, db_setup):
+    now = utcnow().replace(microsecond=0)
+
+    async with SessionLocal() as session:
+        accounts_repo = AccountsRepository(session)
+        usage_repo = UsageRepository(session)
+        logs_repo = RequestLogsRepository(session)
+
+        await accounts_repo.upsert(_make_account("acc_runway", "runway@example.com"))
+        await usage_repo.add_entry(
+            "acc_runway",
+            20.0,
+            window="secondary",
+            window_minutes=10080,
+            reset_at=int(naive_utc_to_epoch(now + timedelta(days=3))),
+            recorded_at=now - timedelta(hours=2),
+        )
+        await logs_repo.add_log(
+            account_id="acc_runway",
+            request_id="req_runway",
+            model="gpt-5.1",
+            input_tokens=600,
+            output_tokens=400,
+            latency_ms=50,
+            status="success",
+            error_code=None,
+            requested_at=now - timedelta(hours=1),
+        )
+        await usage_repo.add_entry(
+            "acc_runway",
+            30.0,
+            window="secondary",
+            window_minutes=10080,
+            reset_at=int(naive_utc_to_epoch(now + timedelta(days=3))),
+            recorded_at=now - timedelta(minutes=10),
+        )
+
+    response = await async_client.get("/api/dashboard/overview")
+    assert response.status_code == 200
+    payload = response.json()
+
+    runway = payload["tokenRunway"]["secondary"]
+    assert runway["confidence"] == "low"
+    assert runway["samples"] == 1
+    assert runway["observedTokens"] == 1000
+    assert runway["observedCreditDelta"] == pytest.approx(756.0)
+    assert runway["tokensPerCredit"] == pytest.approx(1000 / 756)
+    assert runway["estimatedTokensRemaining"] == 7000
 
 
 @pytest.mark.asyncio

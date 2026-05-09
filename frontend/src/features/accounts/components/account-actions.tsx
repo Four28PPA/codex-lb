@@ -21,28 +21,26 @@ export function AccountActions({
   onReauth,
 }: AccountActionsProps) {
   return (
-    <div className="flex flex-wrap gap-2 border-t pt-4">
+    <div className="flex flex-wrap items-center gap-3 pt-2">
       {account.status === "paused" ? (
         <Button
           type="button"
-          size="sm"
-          className="h-8 gap-1.5 text-xs"
+          className="gap-2 rounded-xl"
           onClick={() => onResume(account.accountId)}
           disabled={busy}
         >
-          <Play className="h-3.5 w-3.5" />
+          <Play className="size-4" />
           Resume
         </Button>
       ) : (
         <Button
           type="button"
-          size="sm"
           variant="outline"
-          className="h-8 gap-1.5 text-xs"
+          className="gap-2 rounded-xl border-border/60 hover:bg-muted/50"
           onClick={() => onPause(account.accountId)}
           disabled={busy}
         >
-          <Pause className="h-3.5 w-3.5" />
+          <Pause className="size-4" />
           Pause
         </Button>
       )}
@@ -50,26 +48,24 @@ export function AccountActions({
       {account.status === "deactivated" ? (
         <Button
           type="button"
-          size="sm"
           variant="outline"
-          className="h-8 gap-1.5 text-xs"
+          className="gap-2 rounded-xl border-border/60 hover:bg-muted/50"
           onClick={onReauth}
           disabled={busy}
         >
-          <RefreshCw className="h-3.5 w-3.5" />
+          <RefreshCw className="size-4" />
           Re-authenticate
         </Button>
       ) : null}
 
       <Button
         type="button"
-        size="sm"
         variant="destructive"
-        className="h-8 gap-1.5 text-xs"
+        className="gap-2 rounded-xl bg-red-500/10 text-red-500 hover:bg-red-500/20 hover:text-red-400 border border-red-500/20 shadow-none"
         onClick={() => onDelete(account.accountId)}
         disabled={busy}
       >
-        <Trash2 className="h-3.5 w-3.5" />
+        <Trash2 className="size-4" />
         Delete
       </Button>
     </div>

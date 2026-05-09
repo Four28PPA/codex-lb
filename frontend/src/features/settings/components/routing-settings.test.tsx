@@ -98,7 +98,7 @@ describe("RoutingSettings", () => {
   it("shows the configured upstream transport", () => {
     render(<RoutingSettings settings={BASE_SETTINGS} busy={false} onSave={vi.fn().mockResolvedValue(undefined)} />);
 
-    expect(screen.getByText("Upstream stream transport")).toBeInTheDocument();
+    expect(screen.getByText("Stream transport")).toBeInTheDocument();
     expect(screen.getByText("Server default")).toBeInTheDocument();
   });
 });

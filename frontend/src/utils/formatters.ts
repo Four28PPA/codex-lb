@@ -1,5 +1,4 @@
 import { RESET_ERROR_LABEL } from "@/utils/constants";
-import { getTimeFormatPreference, type TimeFormatPreference } from "@/hooks/use-time-format";
 
 const numberFormatter = new Intl.NumberFormat("en-US");
 const compactFormatter = new Intl.NumberFormat("en-US", {
@@ -17,50 +16,24 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", {
   month: "2-digit",
   day: "2-digit",
 });
-const timeFormatterMap: Record<TimeFormatPreference, Intl.DateTimeFormat> = {
-  "12h": new Intl.DateTimeFormat("en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hourCycle: "h12",
-  }),
-  "24h": new Intl.DateTimeFormat("en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hourCycle: "h23",
-  }),
-};
-const chartDateTimeFormatterMap: Record<TimeFormatPreference, Intl.DateTimeFormat> = {
-  "12h": new Intl.DateTimeFormat("en-US", {
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    hourCycle: "h12",
-  }),
-  "24h": new Intl.DateTimeFormat("en-US", {
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    hourCycle: "h23",
-  }),
-};
+const timeFormatter = new Intl.DateTimeFormat("en-US", {
+  hour: "2-digit",
+  minute: "2-digit",
+  second: "2-digit",
+  hourCycle: "h12",
+});
+const chartDateTimeFormatter = new Intl.DateTimeFormat("en-US", {
+  month: "short",
+  day: "numeric",
+  hour: "2-digit",
+  minute: "2-digit",
+  hourCycle: "h12",
+});
 
 export type FormattedDateTime = {
   time: string;
   date: string;
 };
-
-function getTimeFormatter(): Intl.DateTimeFormat {
-  return timeFormatterMap[getTimeFormatPreference()];
-}
-
-function getChartDateTimeFormatter(): Intl.DateTimeFormat {
-  return chartDateTimeFormatterMap[getTimeFormatPreference()];
-}
-
 type TokenState = {
   state?: string | null;
 };
@@ -216,7 +189,7 @@ export function formatTimeLong(iso: string | null | undefined): FormattedDateTim
     return { time: "--", date: "--" };
   }
   return {
-    time: getTimeFormatter().format(date),
+    time: timeFormatter.format(date),
     date: dateFormatter.format(date),
   };
 }
@@ -228,7 +201,7 @@ export function formatDateTimeInline(iso: string | null | undefined): string {
 
 export function formatChartDateTime(iso: string | null | undefined): string {
   const date = parseDate(iso);
-  return date ? getChartDateTimeFormatter().format(date) : "--";
+  return date ? chartDateTimeFormatter.format(date) : "--";
 }
 
 export function formatRelative(ms: number): string {

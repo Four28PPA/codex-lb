@@ -116,15 +116,15 @@ export function TotpSettings({ settings, disabled = false, onSave }: TotpSetting
   };
 
   return (
-    <section className="rounded-xl border bg-card p-5">
+    <section className="rounded-xl border bg-card p-4 shadow-[var(--shadow-xs)]">
       <div className="space-y-3">
         {/* Status row */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex min-w-0 items-start gap-2.5">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
               <Shield className="h-4 w-4 text-primary" aria-hidden="true" />
             </div>
-            <div>
+            <div className="min-w-0">
               <h3 className="text-sm font-semibold">TOTP</h3>
               <p className="text-xs text-muted-foreground">
                 {settings.totpConfigured ? "TOTP is configured." : "No TOTP configured."}
@@ -132,7 +132,7 @@ export function TotpSettings({ settings, disabled = false, onSave }: TotpSetting
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-2">
             {settings.totpConfigured ? (
               <Button
                 type="button"
@@ -159,7 +159,7 @@ export function TotpSettings({ settings, disabled = false, onSave }: TotpSetting
         </div>
 
         {/* Require on login toggle */}
-        <div className="flex items-center justify-between rounded-lg border p-3">
+        <div className="flex items-center justify-between gap-3 rounded-lg border bg-muted/25 p-3">
           <div>
             <p className="text-sm font-medium">Require TOTP on login</p>
             <p className="text-xs text-muted-foreground">Prompt for TOTP code after password login.</p>

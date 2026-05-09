@@ -39,30 +39,28 @@ export function SessionSettings({ settings, busy, onSave }: SessionSettingsProps
     void onSave(buildSettingsUpdateRequest(settings, { dashboardSessionTtlSeconds: parsedSeconds }));
 
   return (
-    <section className="rounded-xl border bg-card p-5">
+    <section className="rounded-xl border bg-card p-4 shadow-[var(--shadow-xs)]">
       <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
-              <TimerReset className="h-4 w-4 text-primary" aria-hidden="true" />
-            </div>
-            <div>
-              <h3 className="text-sm font-semibold">Session</h3>
-              <p className="text-xs text-muted-foreground">
-                Control how long newly issued password-backed dashboard sessions stay signed in.
-              </p>
-            </div>
+        <div className="flex items-start gap-2.5">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+            <TimerReset className="h-4 w-4 text-primary" aria-hidden="true" />
+          </div>
+          <div className="min-w-0">
+            <h3 className="text-sm font-semibold">Session</h3>
+            <p className="text-xs text-muted-foreground">
+              Password session lifetime.
+            </p>
           </div>
         </div>
 
-        <div className="flex flex-col gap-3 rounded-lg border p-3 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-sm font-medium">Dashboard session lifetime</p>
+        <div className="rounded-lg border bg-muted/25 p-3">
+          <div className="mb-2">
+            <p className="text-sm font-medium">Dashboard lifetime</p>
             <p className="text-xs text-muted-foreground">
-              Absolute lifetime in hours for new password sessions. Existing sessions keep their original expiry.
+              New password sessions only.
             </p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <Input
               type="number"
               min={1}

@@ -70,8 +70,8 @@ describe("apis page integration", () => {
 
 		expect(await screen.findByRole("heading", { name: "Updated from APIs page" })).toBeInTheDocument();
 
-		await user.click(screen.getByRole("button", { name: "Disable" }));
-		expect(await screen.findByRole("button", { name: "Enable" })).toBeInTheDocument();
+		await user.click(screen.getByRole("button", { name: "Disable Key" }));
+		expect(await screen.findByRole("button", { name: "Enable Key" })).toBeInTheDocument();
 
 		await user.click(screen.getByRole("button", { name: "Actions" }));
 		await user.click(screen.getByRole("menuitem", { name: "Regenerate" }));
@@ -80,7 +80,7 @@ describe("apis page integration", () => {
 		expect(within(regeneratedDialog).getByText(/sk-test-regenerated-key_1/)).toBeInTheDocument();
 		await user.click(getDialogFooterClose(regeneratedDialog));
 
-		await user.click(screen.getByRole("button", { name: "Delete" }));
+		await user.click(screen.getByRole("button", { name: "Delete Key" }));
 		const confirmDialog = await screen.findByRole("alertdialog", { name: "Delete API key" });
 		await user.click(within(confirmDialog).getByRole("button", { name: "Delete" }));
 
@@ -170,9 +170,9 @@ describe("apis page integration", () => {
 
 		expect(await screen.findByRole("heading", { name: "Custom analytics key" })).toBeInTheDocument();
 		expect(screen.getByText("All models")).toBeInTheDocument();
-		expect(await screen.findByText(/12K tok/)).toBeInTheDocument();
-		expect(await screen.findByText(/3K cached/)).toBeInTheDocument();
-		expect(await screen.findByText(/42 req/)).toBeInTheDocument();
-		expect(await screen.findByText(/\$0.42/)).toBeInTheDocument();
+		expect(await screen.findByText("12K")).toBeInTheDocument();
+		expect(await screen.findByText("3K")).toBeInTheDocument();
+		expect(await screen.findByText("42")).toBeInTheDocument();
+		expect(await screen.findByText("$0.42")).toBeInTheDocument();
 	});
 });

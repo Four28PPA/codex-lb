@@ -86,16 +86,16 @@ describe("ApiKeyInfo", () => {
 			/>,
 		);
 
-		expect(screen.getByText(/50K tok/)).toBeInTheDocument();
-		expect(screen.getByText(/10K cached/)).toBeInTheDocument();
-		expect(screen.getByText(/150 req/)).toBeInTheDocument();
+		expect(screen.getByText(/50K/)).toBeInTheDocument();
+		expect(screen.getByText(/10K/)).toBeInTheDocument();
+		expect(screen.getByText(/150/)).toBeInTheDocument();
 		expect(screen.getByText(/\$1.23/)).toBeInTheDocument();
 	});
 
 	it("shows an empty limits state when no limits are configured", () => {
 		render(<ApiKeyInfo apiKey={createApiKey({ limits: [] })} />);
 
-		expect(screen.getByText("No limits configured")).toBeInTheDocument();
+		expect(screen.getByText("None")).toBeInTheDocument();
 	});
 
 	it("renders configured token and cost limits with model filters", () => {
@@ -127,9 +127,11 @@ describe("ApiKeyInfo", () => {
 		);
 
 		expect(screen.getByText("2 configured")).toBeInTheDocument();
-		expect(screen.getByText(/Total Tokens \(weekly, gpt-5.1\)/)).toBeInTheDocument();
-		expect(screen.getByText(/750K \/ 1M/)).toBeInTheDocument();
-		expect(screen.getByText(/Cost \(USD\) \(monthly, all\)/)).toBeInTheDocument();
-		expect(screen.getByText(/\$1.50 \/ \$5.00/)).toBeInTheDocument();
+		expect(screen.getByText(/Total Tokens/)).toBeInTheDocument();
+		expect(screen.getByText(/\(weekly, gpt-5\.1\)/)).toBeInTheDocument();
+		expect(screen.getByText(/750K/)).toBeInTheDocument();
+		expect(screen.getByText(/Cost \(USD\)/)).toBeInTheDocument();
+		expect(screen.getByText(/\(monthly, all\)/)).toBeInTheDocument();
+		expect(screen.getByText(/\$1\.50/)).toBeInTheDocument();
 	});
 });

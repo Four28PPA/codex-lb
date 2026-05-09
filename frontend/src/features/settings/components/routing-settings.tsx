@@ -34,26 +34,24 @@ export function RoutingSettings({ settings, busy, onSave }: RoutingSettingsProps
     cacheAffinityTtlValid && parsedCacheAffinityTtl !== settings.openaiCacheAffinityMaxAgeSeconds;
 
   return (
-    <section className="rounded-xl border bg-card p-5">
+    <section className="rounded-xl border bg-card p-4 shadow-[var(--shadow-xs)]">
       <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
-              <Route className="h-4 w-4 text-primary" aria-hidden="true" />
-            </div>
-            <div>
-              <h3 className="text-sm font-semibold">Routing</h3>
-              <p className="text-xs text-muted-foreground">Control how requests are distributed across accounts.</p>
-            </div>
+        <div className="flex items-start gap-2.5">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+            <Route className="h-4 w-4 text-primary" aria-hidden="true" />
+          </div>
+          <div className="min-w-0">
+            <h3 className="text-sm font-semibold">Routing</h3>
+            <p className="text-xs text-muted-foreground">Distribution, affinity, and reset bias.</p>
           </div>
         </div>
 
-        <div className="divide-y rounded-lg border">
-          <div className="flex items-center justify-between gap-4 p-3">
-            <div>
-              <p className="text-sm font-medium">Upstream stream transport</p>
+        <div className="grid gap-2 sm:grid-cols-2">
+          <div className="rounded-lg border bg-muted/25 p-3">
+            <div className="mb-2">
+              <p className="text-sm font-medium">Stream transport</p>
               <p className="text-xs text-muted-foreground">
-                Choose how `codex-lb` connects upstream for streaming responses.
+                Upstream connection mode.
               </p>
             </div>
             <Select
@@ -62,7 +60,7 @@ export function RoutingSettings({ settings, busy, onSave }: RoutingSettingsProps
                 save({ upstreamStreamTransport: value as "default" | "auto" | "http" | "websocket" })
               }
             >
-              <SelectTrigger className="h-8 w-44 text-xs" disabled={busy}>
+              <SelectTrigger className="h-8 w-full text-xs" disabled={busy}>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent align="end">
@@ -74,16 +72,16 @@ export function RoutingSettings({ settings, busy, onSave }: RoutingSettingsProps
             </Select>
           </div>
 
-          <div className="flex items-center justify-between gap-4 p-3">
-            <div>
+          <div className="rounded-lg border bg-muted/25 p-3">
+            <div className="mb-2">
               <p className="text-sm font-medium">Routing strategy</p>
-              <p className="text-xs text-muted-foreground">Choose how requests are distributed across accounts.</p>
+              <p className="text-xs text-muted-foreground">Account selection policy.</p>
             </div>
             <Select
               value={settings.routingStrategy}
               onValueChange={(value) => save({ routingStrategy: value as "usage_weighted" | "round_robin" | "capacity_weighted" })}
             >
-              <SelectTrigger className="h-8 w-44 text-xs" disabled={busy}>
+              <SelectTrigger className="h-8 w-full text-xs" disabled={busy}>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent align="end">
@@ -94,7 +92,7 @@ export function RoutingSettings({ settings, busy, onSave }: RoutingSettingsProps
             </Select>
           </div>
 
-          <div className="flex items-center justify-between p-3">
+          <div className="flex items-center justify-between gap-3 rounded-lg border bg-muted/25 p-3">
             <div>
               <p className="text-sm font-medium">Sticky threads</p>
               <p className="text-xs text-muted-foreground">Keep related requests on the same account.</p>
@@ -106,7 +104,7 @@ export function RoutingSettings({ settings, busy, onSave }: RoutingSettingsProps
             />
           </div>
 
-          <div className="flex items-center justify-between p-3">
+          <div className="flex items-center justify-between gap-3 rounded-lg border bg-muted/25 p-3">
             <div>
               <p className="text-sm font-medium">Prefer earlier reset</p>
               <p className="text-xs text-muted-foreground">Bias traffic to accounts with earlier quota reset.</p>
@@ -118,14 +116,14 @@ export function RoutingSettings({ settings, busy, onSave }: RoutingSettingsProps
             />
           </div>
 
-          <div className="flex flex-col gap-3 p-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="rounded-lg border bg-muted/25 p-3 sm:col-span-2">
             <div>
               <p className="text-sm font-medium">Prompt-cache affinity TTL</p>
               <p className="text-xs text-muted-foreground">
                 Keep OpenAI-style prompt-cache mappings warm for a bounded number of seconds.
               </p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="mt-2 flex items-center gap-2">
               <Input
                 type="number"
                 min={1}

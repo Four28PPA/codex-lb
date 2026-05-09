@@ -47,24 +47,24 @@ export function AccountListItem({ account, selected, showAccountId = false, onSe
       type="button"
       onClick={() => onSelect(account.accountId)}
       className={cn(
-        "w-full rounded-lg px-3 py-2.5 text-left transition-colors",
+        "group w-full rounded-xl px-4 py-3 text-left transition-all duration-200 border",
         selected
-          ? "bg-primary/8 ring-1 ring-primary/25"
-          : "hover:bg-muted/50",
+          ? "bg-card/80 border-primary/20 shadow-sm backdrop-blur-md"
+          : "bg-transparent border-transparent hover:bg-card/40 hover:border-border/30",
       )}
     >
-      <div className="flex items-center gap-2.5">
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-medium">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0 flex-1 space-y-1">
+          <p className="truncate text-sm font-semibold tracking-tight text-foreground/90 group-hover:text-foreground transition-colors">
             {titleIsEmail && blurred ? <span className="privacy-blur">{title}</span> : title}
           </p>
-          <p className="truncate text-xs text-muted-foreground" title={showAccountId ? `Account ID ${account.accountId}` : undefined}>
+          <p className="truncate text-xs font-medium text-muted-foreground/80" title={showAccountId ? `Account ID ${account.accountId}` : undefined}>
             {emailSubtitle ? <><span className={blurred ? "privacy-blur" : undefined}>{emailSubtitle}</span>{idSuffix}</> : <>{baseSubtitle}{idSuffix}</>}
           </p>
         </div>
         <StatusBadge status={status} />
       </div>
-      <div className="mt-1.5">
+      <div className="mt-3">
         <MiniQuotaBar percent={secondary} />
       </div>
     </button>

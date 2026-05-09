@@ -87,10 +87,11 @@ describe("RecentRequestsTable", () => {
     expect(screen.getByText("Requested priority")).toBeInTheDocument();
     expect(screen.getByText("WS")).toBeInTheDocument();
     expect(screen.getByText("Rate limit")).toBeInTheDocument();
-    expect(screen.getByText("rate_limit_exceeded")).toBeInTheDocument();
+    expect(screen.queryByRole("columnheader", { name: "Error" })).not.toBeInTheDocument();
+    const errorButton = screen.getByRole("button", { name: /Show error details: Rate limit reached/ });
+    expect(errorButton).toHaveAttribute("title", longError);
 
-    const viewButton = screen.getByRole("button", { name: "View Details" });
-    fireEvent.click(viewButton);
+    fireEvent.click(errorButton);
     const dialog = screen.getByRole("dialog");
     expect(dialog).toBeInTheDocument();
     expect(screen.getByText("Request Details")).toBeInTheDocument();
@@ -185,8 +186,8 @@ describe("RecentRequestsTable", () => {
       />,
     );
 
-    expect(screen.getAllByText("upstream_error")[0]).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "View Details" }));
+    expect(screen.queryByRole("columnheader", { name: "Error" })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /Show error details: upstream_error/ }));
 
     expect(screen.getByRole("dialog")).toHaveTextContent("upstream_error");
     expect(screen.getByRole("dialog")).toHaveTextContent("Full Error");

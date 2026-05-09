@@ -33,8 +33,7 @@ describe("DonutChart", () => {
     expect(screen.getByText("Window 5h")).toBeInTheDocument();
     expect(screen.getByText("Account A")).toBeInTheDocument();
     expect(screen.getByText("Account B")).toBeInTheDocument();
-    expect(screen.getByText("Remaining")).toBeInTheDocument();
-    expect(screen.getByTestId("donut-caption")).toHaveTextContent("Total 200 · 0% used");
+    expect(screen.getByText("Tokens left")).toBeInTheDocument();
     expect(screen.getByTestId("donut-used-row")).toHaveTextContent("Used0");
 
     const svg = container.querySelector("svg");
@@ -75,13 +74,13 @@ describe("DonutChart", () => {
       { label: "Account B", value: 80, color: "#d9a441" },
     ];
     const { container } = render(
-      <DonutChart title="With Consumed" total={500} items={items} />,
+      <DonutChart title="With Consumed" subtitle="Total 500 · 60% used" total={500} items={items} />,
     );
 
     // When total > sum(items), there should be 3 cells (2 items + 1 consumed gray)
     const cells = container.querySelectorAll(".recharts-pie-sector");
     expect(cells).toHaveLength(3);
-    expect(screen.getByTestId("donut-caption")).toHaveTextContent("Total 500 · 60% used");
+    expect(screen.getByText("Total 500 · 60% used")).toBeInTheDocument();
     expect(screen.getByTestId("donut-used-value")).toHaveTextContent("300");
   });
 
@@ -89,6 +88,7 @@ describe("DonutChart", () => {
     render(
       <DonutChart
         title="Remaining vs Consumed"
+        subtitle="Total 500 · 60% used"
         total={500}
         centerValue={200}
         items={BASE_ITEMS}
@@ -96,7 +96,7 @@ describe("DonutChart", () => {
     );
 
     expect(screen.getByText("200")).toBeInTheDocument();
-    expect(screen.getByTestId("donut-caption")).toHaveTextContent("Total 500 · 60% used");
+    expect(screen.getByText("Total 500 · 60% used")).toBeInTheDocument();
   });
 
   it("renders a gray Used row beneath the account legend", () => {
@@ -191,7 +191,7 @@ describe("DonutChart", () => {
 
     const svg = container.querySelector("svg");
     expect(svg).not.toBeNull();
-    expect(screen.getByText("Remaining")).toBeInTheDocument();
+    expect(screen.getByText("Tokens left")).toBeInTheDocument();
   });
 
   it("renders without safeLine (no regression)", () => {

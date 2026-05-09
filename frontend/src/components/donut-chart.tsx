@@ -23,6 +23,7 @@ export type DonutChartProps = {
   items: DonutChartItem[];
   total: number;
   centerValue?: number;
+  centerLabel?: string;
   title: string;
   subtitle?: string;
   safeLine?: { safePercent: number; riskLevel: "safe" | "warning" | "danger" | "critical" } | null;
@@ -70,12 +71,12 @@ function SafeLineTick({
   );
 }
 
-const CHART_SIZE = 152;
+const CHART_SIZE = 192;
 const CHART_MARGIN = 4;
-const PIE_CX = 72;
-const PIE_CY = 72;
-const INNER_R = 53;
-const OUTER_R = 68;
+const PIE_CX = 92;
+const PIE_CY = 92;
+const INNER_R = 66;
+const OUTER_R = 84;
 const ACTIVE_RADIUS_OFFSET = 4;
 const LEGEND_VISIBLE_COUNT = 5;
 const LEGEND_ROW_HEIGHT_REM = 1.75;
@@ -97,7 +98,7 @@ function formatUsedPercent(percent: number): string {
   return `${percent.toLocaleString("en-US", { maximumFractionDigits })}%`;
 }
 
-export function DonutChart({ items, total, centerValue, title, subtitle, safeLine }: DonutChartProps) {
+export function DonutChart({ items, total, centerValue, centerLabel = "Tokens left", title, subtitle, safeLine }: DonutChartProps) {
   const isDark = useThemeStore((s) => s.theme === "dark");
   const blurred = usePrivacyStore((s) => s.blurred);
   const reducedMotion = useReducedMotion();
@@ -160,14 +161,22 @@ export function DonutChart({ items, total, centerValue, title, subtitle, safeLin
 
   return (
     <div className="rounded-xl border bg-card p-5">
-      <div className="mb-5">
-        <h3 className="text-sm font-semibold">{title}</h3>
-        {subtitle ? <p className="mt-0.5 text-xs text-muted-foreground">{subtitle}</p> : null}
+      <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0">
+          <h3 className="text-sm font-semibold">{title}</h3>
+          {subtitle ? <p className="mt-0.5 text-xs text-muted-foreground">{subtitle}</p> : null}
+        </div>
+        <div className="shrink-0 rounded-full border border-border/70 bg-muted/35 px-3 py-1 text-[11px] font-medium tabular-nums text-muted-foreground">
+          <span className="text-foreground">{formatCompactNumber(consumed)}</span>
+          <span className="mx-1 text-muted-foreground/70">/</span>
+          {formatCompactNumber(safeCapacity)} used
+          <span className="ml-1 text-muted-foreground/70">({formatUsedPercent(usedPercent)})</span>
+        </div>
       </div>
 
-      <div className="flex items-center gap-6">
-        <div className="flex shrink-0 flex-col items-center gap-2">
-          <div className="relative h-[152px] w-[152px] overflow-visible">
+      <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:gap-5">
+        <div className="flex shrink-0 items-center justify-center">
+          <div className="relative h-[192px] w-[192px] overflow-visible">
             <PieChart width={CHART_SIZE} height={CHART_SIZE} margin={{ top: CHART_MARGIN, right: CHART_MARGIN, bottom: CHART_MARGIN, left: CHART_MARGIN }}>
              <Pie
                data={chartData}
@@ -209,16 +218,13 @@ export function DonutChart({ items, total, centerValue, title, subtitle, safeLin
               />
             </svg>
           ) : null}
-          <div className="absolute inset-[22px] flex items-center justify-center rounded-full text-center pointer-events-none">
+          <div className="absolute inset-[30px] flex items-center justify-center rounded-full text-center pointer-events-none">
              <div>
-               <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">Remaining</p>
-               <p className="text-base font-semibold tabular-nums">{formatCompactNumber(displayTotal)}</p>
+               <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">{centerLabel}</p>
+               <p className="text-2xl font-semibold tabular-nums tracking-tight">{formatCompactNumber(displayTotal)}</p>
             </div>
           </div>
           </div>
-          <p className="text-[11px] tabular-nums text-muted-foreground" data-testid="donut-caption">
-            Total {formatCompactNumber(safeCapacity)} · {formatUsedPercent(usedPercent)} used
-          </p>
         </div>
 
         <div

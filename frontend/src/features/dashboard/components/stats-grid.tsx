@@ -11,34 +11,36 @@ const ACCENT_STYLES = [
 
 export type StatsGridProps = {
   stats: DashboardStat[];
+  className?: string;
 };
 
-export function StatsGrid({ stats }: StatsGridProps) {
+export function StatsGrid({ stats, className }: StatsGridProps) {
   return (
-    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+    <div className={cn("grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-border/40 overflow-hidden rounded-2xl border bg-card shadow-[var(--shadow-sm)]", className)}>
       {stats.map((stat, index) => {
         const Icon = stat.icon;
         const accent = ACCENT_STYLES[index % ACCENT_STYLES.length];
         return (
           <div
             key={stat.label}
-            className="animate-fade-in-up card-hover rounded-xl border bg-card p-4"
-            style={{ animationDelay: `${index * 75}ms` }}
+            className="group relative flex flex-col justify-between p-5 transition-colors hover:bg-muted/30"
           >
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">{stat.label}</span>
-              <div className={cn("flex h-8 w-8 items-center justify-center rounded-lg", accent)}>
-                <Icon className="h-4 w-4" aria-hidden="true" />
+            <div className="relative flex flex-col gap-4">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">{stat.label}</span>
+                <div className={cn("flex h-8 w-8 items-center justify-center rounded-lg transition-transform group-hover:scale-105", accent)}>
+                  <Icon className="h-4 w-4" aria-hidden="true" />
+                </div>
+              </div>
+              <div>
+                <p className="text-3xl font-semibold tracking-[-0.03em] tabular-nums">{stat.value}</p>
+                {stat.meta ? (
+                  <p className="mt-1 text-xs text-muted-foreground">{stat.meta}</p>
+                ) : null}
               </div>
             </div>
-            <div className="mt-1">
-              <p className="text-[1.625rem] font-semibold tracking-[-0.02em]">{stat.value}</p>
-              {stat.meta ? (
-                <p className="mt-1 text-xs text-muted-foreground">{stat.meta}</p>
-              ) : null}
-            </div>
             {stat.trend.length > 0 ? (
-              <div className="mt-1">
+              <div className="mt-4 h-10 w-full opacity-40 transition-opacity duration-500 group-hover:opacity-100">
                 <SparklineChart data={stat.trend} color={stat.trendColor} index={index} />
               </div>
             ) : null}

@@ -17,8 +17,10 @@ from app.modules.dashboard.repository import DashboardRepository
 from app.modules.dashboard.schemas import (
     DashboardOverviewResponse,
     DashboardOverviewTimeframeKey,
+    DashboardTokenRunway,
     DashboardUsageWindows,
     DepletionResponse,
+    TokenRunwayEstimateResponse,
 )
 from app.modules.usage.builders import (
     align_bucket_window_start,
@@ -30,6 +32,7 @@ from app.modules.usage.depletion_service import (
     compute_aggregate_depletion,
     compute_depletion_for_account,
 )
+from app.modules.dashboard.token_runway import TokenRunwayEstimate, build_token_runway_estimate
 
 
 class DashboardService:
@@ -215,6 +218,40 @@ class DashboardService:
 
         pri_depletion, sec_depletion = _build_depletion_by_window(primary_history, secondary_history, now)
 
+        runway_logs_since = min(
+            [since for since in [pri_since if pri_fetch_ids else None, sec_since if sec_fetch_ids else None] if since is not None],
+            default=bucket_since,
+        )
+        runway_logs = await self._repo.list_logs_since(runway_logs_since)
+        token_runway = DashboardTokenRunway(
+            primary=(
+                _token_runway_to_response(
+                    build_token_runway_estimate(
+                        window_key="primary",
+                        accounts=accounts,
+                        usage_history=primary_history,
+                        request_logs=runway_logs,
+                        remaining_credits=sum(max(0.0, item.remaining_credits) for item in windows.primary.accounts),
+                    )
+                )
+                if primary_history
+                else None
+            ),
+            secondary=(
+                _token_runway_to_response(
+                    build_token_runway_estimate(
+                        window_key="secondary",
+                        accounts=accounts,
+                        usage_history=secondary_history,
+                        request_logs=runway_logs,
+                        remaining_credits=sum(max(0.0, item.remaining_credits) for item in windows.secondary.accounts),
+                    )
+                )
+                if windows.secondary is not None and secondary_history
+                else None
+            ),
+        )
+
         additional_ts = await self._repo.latest_additional_recorded_at()
         return DashboardOverviewResponse(
             last_sync_at=_latest_recorded_at(primary_usage, secondary_usage, additional_ts),
@@ -223,9 +260,24 @@ class DashboardService:
             summary=summary,
             windows=windows,
             trends=trends,
+            token_runway=token_runway,
             depletion_primary=pri_depletion,
             depletion_secondary=sec_depletion,
         )
+
+
+def _token_runway_to_response(estimate: TokenRunwayEstimate) -> TokenRunwayEstimateResponse:
+    return TokenRunwayEstimateResponse(
+        window_key=estimate.window_key,
+        estimated_tokens_remaining=estimate.estimated_tokens_remaining,
+        tokens_per_credit=estimate.tokens_per_credit,
+        observed_tokens=estimate.observed_tokens,
+        observed_credit_delta=estimate.observed_credit_delta,
+        samples=estimate.samples,
+        confidence=estimate.confidence,
+        last_learned_at=estimate.last_learned_at,
+    )
+
 
 
 def _build_depletion_by_window(

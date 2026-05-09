@@ -1,10 +1,11 @@
-import { Activity, AlertTriangle, Coins, DollarSign, type LucideIcon } from "lucide-react";
+import { Activity, Coins, DollarSign, type LucideIcon } from "lucide-react";
 
 import type {
   AccountSummary,
   DashboardOverview,
   Depletion,
   RequestLog,
+  TokenRunwayEstimate,
   TrendPoint,
   UsageWindow,
 } from "@/features/dashboard/schemas";
@@ -14,7 +15,6 @@ import {
   formatCachedTokensMeta,
   formatCompactNumber,
   formatCurrency,
-  formatRate,
   formatWindowMinutes,
 } from "@/utils/formatters";
 
@@ -39,6 +39,16 @@ export type DashboardStat = {
   trendColor: string;
 };
 
+export type DashboardPosture = {
+  level: "ready" | "watch" | "blocked" | "monitoring";
+  label: string;
+  summary: string;
+  detail: string;
+  errorRate: number | null;
+  errorCount: number;
+  constrainedAccounts: number;
+};
+
 export interface SafeLineView {
   safePercent: number;
   riskLevel: "safe" | "warning" | "danger" | "critical";
@@ -46,15 +56,22 @@ export interface SafeLineView {
 
 export type DashboardView = {
   stats: DashboardStat[];
+  posture: DashboardPosture;
   primaryUsageItems: RemainingItem[];
   secondaryUsageItems: RemainingItem[];
   /** Sum of visible primary remaining items shown in the donut center label. */
   primaryTotal: number;
   /** Sum of visible secondary remaining items shown in the donut center label. */
   secondaryTotal: number;
+  /** Estimated primary token capacity for the donut's used-vs-left denominator. */
+  primaryCapacityTotal: number;
+  /** Estimated secondary token capacity for the donut's used-vs-left denominator. */
+  secondaryCapacityTotal: number;
   requestLogs: RequestLog[];
   safeLinePrimary: SafeLineView | null;
   safeLineSecondary: SafeLineView | null;
+  tokenRunwayPrimary: TokenRunwayEstimate | null;
+  tokenRunwaySecondary: TokenRunwayEstimate | null;
 };
 
 export function buildDepletionView(depletion: Depletion | null | undefined): SafeLineView | null {
@@ -62,13 +79,20 @@ export function buildDepletionView(depletion: Depletion | null | undefined): Saf
   return { safePercent: depletion.safeUsagePercent, riskLevel: depletion.riskLevel };
 }
 
+const PLAN_TOKEN_BUDGET = 600_000_000;
+
 function buildWindowIndex(window: UsageWindow | null): Map<string, number> {
   const index = new Map<string, number>();
   if (!window) {
     return index;
   }
   for (const entry of window.accounts) {
-    index.set(entry.accountId, entry.remainingCredits);
+    if (entry.remainingPercentAvg == null && entry.remainingCredits <= 0) {
+      continue;
+    }
+    if (Number.isFinite(entry.remainingCredits)) {
+      index.set(entry.accountId, entry.remainingCredits);
+    }
   }
   return index;
 }
@@ -126,17 +150,23 @@ export function buildRemainingItems(
   window: UsageWindow | null,
   windowKey: "primary" | "secondary",
   isDark = false,
+  fallbackRemainingTotal?: number | null,
 ): RemainingItem[] {
   const usageIndex = buildWindowIndex(window);
   const palette = buildDonutPalette(accounts.length, isDark);
   const duplicateAccountIds = buildDuplicateAccountIdSet(accounts);
+  const visibleAccounts = accounts.filter((account) => !(windowKey === "primary" && isWeeklyOnlyAccount(account)));
+  const hasWindowRows = usageIndex.size > 0;
+  const shouldUseSingleAccountSummaryFallback =
+    !hasWindowRows &&
+    visibleAccounts.length === 1 &&
+    fallbackRemainingTotal != null &&
+    Number.isFinite(fallbackRemainingTotal);
 
-  return accounts
+  return visibleAccounts
     .map((account, index) => {
-      if (windowKey === "primary" && isWeeklyOnlyAccount(account)) {
-        return null;
-      }
-      const remaining = usageIndex.get(account.accountId) ?? 0;
+      const remaining = usageIndex.get(account.accountId)
+        ?? (shouldUseSingleAccountSummaryFallback ? Math.max(0, fallbackRemainingTotal) : 0);
       const rawLabel = account.displayName || account.email || account.accountId;
       const labelIsEmail = !!account.email && rawLabel === account.email;
       const labelSuffix = duplicateAccountIds.has(account.accountId)
@@ -151,8 +181,69 @@ export function buildRemainingItems(
         remainingPercent: accountRemainingPercent(account, windowKey),
         color: palette[index % palette.length],
       };
-    })
-    .filter((item): item is RemainingItem => item !== null);
+    });
+}
+
+function tokenBudgetForAccount(): number {
+  return PLAN_TOKEN_BUDGET;
+}
+
+export function buildTokenRemainingItems(
+  accounts: AccountSummary[],
+  windowKey: "primary" | "secondary",
+  isDark = false,
+): RemainingItem[] {
+  const palette = buildDonutPalette(accounts.length, isDark);
+  const duplicateAccountIds = buildDuplicateAccountIdSet(accounts);
+  const visibleAccounts = accounts.filter((account) => !(windowKey === "primary" && isWeeklyOnlyAccount(account)));
+
+  return visibleAccounts.map((account, index) => {
+    const remainingPercent = accountRemainingPercent(account, windowKey);
+    const tokenBudget = tokenBudgetForAccount();
+    const remainingTokens = remainingPercent == null ? 0 : (tokenBudget * Math.max(0, Math.min(100, remainingPercent))) / 100;
+    const rawLabel = account.displayName || account.email || account.accountId;
+    const labelIsEmail = !!account.email && rawLabel === account.email;
+    const labelSuffix = duplicateAccountIds.has(account.accountId)
+      ? ` (${formatCompactAccountId(account.accountId, 5, 4)})`
+      : "";
+
+    return {
+      accountId: account.accountId,
+      label: rawLabel,
+      labelSuffix,
+      isEmail: labelIsEmail,
+      value: remainingTokens,
+      remainingPercent,
+      color: palette[index % palette.length],
+    };
+  });
+}
+
+function tokenCapacityTotal(accounts: AccountSummary[], windowKey: "primary" | "secondary"): number {
+  return accounts
+    .filter((account) => !(windowKey === "primary" && isWeeklyOnlyAccount(account)))
+    .reduce((total) => total + tokenBudgetForAccount(), 0);
+}
+
+function tokenRunwayWithPlanFallback(
+  estimate: TokenRunwayEstimate | null | undefined,
+  remainingTokens: number,
+  windowKey: "primary" | "secondary",
+): TokenRunwayEstimate | null {
+  if (remainingTokens <= 0) {
+    return estimate ?? null;
+  }
+
+  return {
+    windowKey: estimate?.windowKey ?? windowKey,
+    estimatedTokensRemaining: remainingTokens,
+    tokensPerCredit: null,
+    observedTokens: estimate?.observedTokens ?? 0,
+    observedCreditDelta: estimate?.observedCreditDelta ?? 0,
+    samples: estimate?.samples ?? 0,
+    confidence: estimate?.confidence === "learning" || !estimate ? "low" : estimate.confidence,
+    lastLearnedAt: estimate?.lastLearnedAt ?? null,
+  };
 }
 
 function avgPerUnit(total: number, units: number): number {
@@ -160,6 +251,12 @@ function avgPerUnit(total: number, units: number): number {
     return 0;
   }
   return total / units;
+}
+
+function formatCursorPlanEstimate(tokens: number | null | undefined): string {
+  const safeTokens = Math.max(0, tokens ?? 0);
+  const planCount = safeTokens / 600_000_000;
+  return `${planCount.toLocaleString("en-US", { maximumFractionDigits: 2 })} × $200 Cursor plans`;
 }
 
 const TREND_COLORS = ["#3b82f6", "#8b5cf6", "#10b981", "#f59e0b"];
@@ -173,15 +270,94 @@ export function sumRemaining(items: RemainingItem[]): number {
   return items.reduce((sum, item) => sum + Math.max(0, item.value), 0);
 }
 
+function countConstrainedAccounts(accounts: AccountSummary[]): number {
+  return accounts.filter((account) => {
+    const primary = account.usage?.primaryRemainingPercent;
+    const secondary = account.usage?.secondaryRemainingPercent;
+    return (primary != null && primary < 15) || (secondary != null && secondary < 15);
+  }).length;
+}
+
+export function buildDashboardPosture(overview: DashboardOverview): DashboardPosture {
+  const metrics = overview.summary.metrics;
+  const errorRate = metrics?.errorRate ?? null;
+  const errorCount = metrics?.errorCount ?? 0;
+  const topError = metrics?.topError;
+  const constrainedAccounts = countConstrainedAccounts(overview.accounts);
+  const depletionLevels = [overview.depletionPrimary?.riskLevel, overview.depletionSecondary?.riskLevel].filter(Boolean);
+  const hasCriticalDepletion = depletionLevels.includes("critical") || depletionLevels.includes("danger");
+  const hasWarningDepletion = depletionLevels.includes("warning");
+
+  if (errorRate != null && errorRate >= 0.05) {
+    return {
+      level: "blocked",
+      label: "Blocked",
+      summary: "Request failures need attention",
+      detail: topError ? `Top error: ${topError}` : `${formatCompactNumber(errorCount)} recent errors`,
+      errorRate,
+      errorCount,
+      constrainedAccounts,
+    };
+  }
+
+  if (hasCriticalDepletion || constrainedAccounts > 0 || (errorRate != null && errorRate >= 0.01)) {
+    return {
+      level: "watch",
+      label: "Watch",
+      summary: "Routing is active with capacity pressure",
+      detail: constrainedAccounts > 0
+        ? `${constrainedAccounts} account${constrainedAccounts === 1 ? "" : "s"} below 15% remaining`
+        : topError
+          ? `Top error: ${topError}`
+          : "Capacity safe line is elevated",
+      errorRate,
+      errorCount,
+      constrainedAccounts,
+    };
+  }
+
+  if (hasWarningDepletion) {
+    return {
+      level: "watch",
+      label: "Watch",
+      summary: "Usage is trending toward the safe line",
+      detail: "Monitor the active token window before heavy traffic.",
+      errorRate,
+      errorCount,
+      constrainedAccounts,
+    };
+  }
+
+  if ((metrics?.requests ?? 0) === 0) {
+    return {
+      level: "monitoring",
+      label: "Monitoring",
+      summary: "Waiting for request traffic",
+      detail: "Dashboard will populate as proxy traffic arrives.",
+      errorRate,
+      errorCount,
+      constrainedAccounts,
+    };
+  }
+
+  return {
+    level: "ready",
+    label: "Ready",
+    summary: "Routing posture looks healthy",
+    detail: "No immediate token or error pressure detected.",
+    errorRate,
+    errorCount,
+    constrainedAccounts,
+  };
+}
+
 export function buildDashboardView(
   overview: DashboardOverview,
   requestLogs: RequestLog[],
   isDark = false,
 ): DashboardView {
-  const primaryWindow = overview.windows.primary;
   const secondaryWindow = overview.windows.secondary;
   const metrics = overview.summary.metrics;
-  const cost = overview.summary.cost.totalUsd;
   const timeframeLabel = (() => {
     const formatted = formatWindowMinutes(overview.timeframe.windowMinutes);
     return formatted === "--" ? overview.timeframe.key : formatted;
@@ -192,11 +368,8 @@ export function buildDashboardView(
     timeframeHours <= 24
       ? `Avg/hr ${formatCompactNumber(Math.round(avgPerUnit(metrics?.requests ?? 0, timeframeHours)))}`
       : `Avg/day ${formatCompactNumber(Math.round(avgPerUnit(metrics?.requests ?? 0, timeframeDays)))}`;
-  const costMeta =
-    timeframeHours <= 24
-      ? `Avg/hr ${formatCurrency(avgPerUnit(cost, timeframeHours))}`
-      : `Avg/day ${formatCurrency(avgPerUnit(cost, timeframeDays))}`;
   const trends = overview.trends;
+  const totalTokens = metrics?.tokens ?? 0;
 
   const stats: DashboardStat[] = [
     {
@@ -217,38 +390,45 @@ export function buildDashboardView(
     },
     {
       label: `Cost (${timeframeLabel})`,
-      value: formatCurrency(cost),
-      meta: costMeta,
+      value: formatCurrency((totalTokens / 600_000_000) * 200),
+      meta: `Estimate ${formatCursorPlanEstimate(totalTokens)}`,
       icon: DollarSign,
-      trend: trendPointsToValues(trends.cost),
+      trend: trendPointsToValues(trends.tokens).map((point) => ({ value: (point.value / 600_000_000) * 200 })),
       trendColor: TREND_COLORS[2],
-    },
-    {
-      label: `Error rate (${timeframeLabel})`,
-      value: formatRate(metrics?.errorRate ?? null),
-      meta: metrics?.topError
-        ? `Top: ${metrics.topError}`
-        : `~${formatCompactNumber(metrics?.errorCount ?? Math.round((metrics?.errorRate ?? 0) * (metrics?.requests ?? 0)))} errors in ${timeframeLabel}`,
-      icon: AlertTriangle,
-      trend: trendPointsToValues(trends.errorRate),
-      trendColor: TREND_COLORS[3],
     },
   ];
 
-  const rawPrimaryItems = buildRemainingItems(overview.accounts, primaryWindow, "primary", isDark);
-  const secondaryUsageItems = buildRemainingItems(overview.accounts, secondaryWindow, "secondary", isDark);
+  const rawPrimaryItems = buildTokenRemainingItems(
+    overview.accounts,
+    "primary",
+    isDark,
+  );
+  const secondaryUsageItems = buildTokenRemainingItems(
+    overview.accounts,
+    "secondary",
+    isDark,
+  );
   const primaryUsageItems = secondaryWindow
     ? applySecondaryConstraint(rawPrimaryItems, secondaryUsageItems)
     : rawPrimaryItems;
+  const primaryTotal = sumRemaining(primaryUsageItems);
+  const secondaryTotal = sumRemaining(secondaryUsageItems);
+  const primaryCapacityTotal = tokenCapacityTotal(overview.accounts, "primary");
+  const secondaryCapacityTotal = tokenCapacityTotal(overview.accounts, "secondary");
 
   return {
     stats,
+    posture: buildDashboardPosture(overview),
     primaryUsageItems,
     secondaryUsageItems,
-    primaryTotal: sumRemaining(primaryUsageItems),
-    secondaryTotal: sumRemaining(secondaryUsageItems),
+    primaryTotal,
+    secondaryTotal,
+    primaryCapacityTotal,
+    secondaryCapacityTotal,
     requestLogs,
     safeLinePrimary: buildDepletionView(overview.depletionPrimary),
     safeLineSecondary: buildDepletionView(overview.depletionSecondary),
+    tokenRunwayPrimary: tokenRunwayWithPlanFallback(overview.tokenRunway?.primary ?? null, primaryTotal, "primary"),
+    tokenRunwaySecondary: tokenRunwayWithPlanFallback(overview.tokenRunway?.secondary ?? null, secondaryTotal, "secondary"),
   };
 }

@@ -18,7 +18,11 @@ const OauthDialog = lazy(() =>
   import("@/features/accounts/components/oauth-dialog").then((m) => ({ default: m.OauthDialog })),
 );
 
-export function AccountsPage() {
+export type AccountsPageProps = {
+  embedded?: boolean;
+};
+
+export function AccountsPage({ embedded = false }: AccountsPageProps) {
   const [searchParams, setSearchParams] = useSearchParams();
   const {
     accountsQuery,
@@ -74,29 +78,32 @@ export function AccountsPage() {
     getErrorMessageOrNull(deleteMutation.error);
 
   return (
-    <div className="animate-fade-in-up space-y-6">
-      {/* Page header */}
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Accounts</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Manage imported accounts and authentication flows.
-        </p>
-      </div>
+    <div className="space-y-4">
+      {!embedded ? (
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">Accounts</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Manage imported accounts and authentication flows.
+          </p>
+        </div>
+      ) : null}
 
       {mutationError ? <AlertMessage variant="error">{mutationError}</AlertMessage> : null}
 
       {!accountsQuery.data ? (
         <AccountsSkeleton />
       ) : (
-        <div className="grid gap-4 lg:grid-cols-[22rem_minmax(0,1fr)]">
-          <div className="rounded-xl border bg-card p-4">
-            <AccountList
-              accounts={accounts}
-              selectedAccountId={resolvedSelectedAccountId}
-              onSelect={handleSelectAccount}
-              onOpenImport={() => importDialog.show()}
-              onOpenOauth={() => oauthDialog.show()}
-            />
+        <div className="grid gap-6 lg:grid-cols-[20rem_minmax(0,1fr)] items-start">
+          <div className="sticky top-[7rem]">
+            <div className="rounded-2xl border border-border/40 bg-card/40 p-4 shadow-sm backdrop-blur-sm">
+              <AccountList
+                accounts={accounts}
+                selectedAccountId={resolvedSelectedAccountId}
+                onSelect={handleSelectAccount}
+                onOpenImport={() => importDialog.show()}
+                onOpenOauth={() => oauthDialog.show()}
+              />
+            </div>
           </div>
 
           <AccountDetail

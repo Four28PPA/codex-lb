@@ -59,8 +59,8 @@ describe("dashboard flow integration", () => {
     window.history.pushState({}, "", "/dashboard");
     renderWithProviders(<App />);
 
-    expect(await screen.findByRole("heading", { name: "Dashboard" })).toBeInTheDocument();
-    expect(await screen.findByText("Request Logs")).toBeInTheDocument();
+    expect(await screen.findByRole("link", { name: "Dashboard" })).toHaveAttribute("aria-current", "page");
+    expect(await screen.findByRole("heading", { name: "Routing audit trail" })).toBeInTheDocument();
 
     await waitFor(() => {
       expect(overviewCalls).toBeGreaterThan(0);
@@ -85,7 +85,7 @@ describe("dashboard flow integration", () => {
     const overviewAfterTimeframe = overviewCalls;
 
     await user.type(
-      screen.getByPlaceholderText("Search request id, account, API key, model, error..."),
+      screen.getByPlaceholderText("Search requests..."),
       "quota",
     );
 

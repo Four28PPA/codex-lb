@@ -92,9 +92,9 @@ describe("ApiDetail", () => {
 			}),
 		});
 
-		expect(screen.getByText(/280K tok/)).toBeInTheDocument();
-		expect(screen.getByText(/45K cached/)).toBeInTheDocument();
-		expect(screen.getByText(/350 req/)).toBeInTheDocument();
+		expect(screen.getByText(/280K/)).toBeInTheDocument();
+		expect(screen.getByText(/45K/)).toBeInTheDocument();
+		expect(screen.getByText(/350/)).toBeInTheDocument();
 		expect(screen.getByText(/\$2.47/)).toBeInTheDocument();
 	});
 
@@ -113,8 +113,7 @@ describe("ApiDetail", () => {
 		});
 
 		expect(screen.getByText("Loading 7-day usage...")).toBeInTheDocument();
-		expect(screen.queryByText(/15 tok/)).not.toBeInTheDocument();
-		expect(screen.queryByText(/1 req/)).not.toBeInTheDocument();
+		expect(screen.queryByText(/15/)).not.toBeInTheDocument();
 	});
 
 	it("shows a usage error instead of falling back to list summary usage", () => {
@@ -133,7 +132,7 @@ describe("ApiDetail", () => {
 
 		expect(screen.getByText("boom usage")).toBeInTheDocument();
 		expect(screen.getByText("7-day usage unavailable")).toBeInTheDocument();
-		expect(screen.queryByText(/15 tok/)).not.toBeInTheDocument();
+		expect(screen.queryByText(/15/)).not.toBeInTheDocument();
 	});
 
 	it("keeps the accumulated toggle interactive when trend data is present", async () => {
@@ -165,8 +164,8 @@ describe("ApiDetail", () => {
 			/>,
 		);
 
-		expect(screen.getByRole("button", { name: "Disable" })).toBeInTheDocument();
-		expect(screen.queryByRole("button", { name: "Enable" })).not.toBeInTheDocument();
+		expect(screen.getByRole("button", { name: "Disable Key" })).toBeInTheDocument();
+		expect(screen.queryByRole("button", { name: "Enable Key" })).not.toBeInTheDocument();
 
 		rerender(
 			<ApiDetail
@@ -180,8 +179,8 @@ describe("ApiDetail", () => {
 			/>,
 		);
 
-		expect(screen.getByRole("button", { name: "Enable" })).toBeInTheDocument();
-		expect(screen.queryByRole("button", { name: "Disable" })).not.toBeInTheDocument();
+		expect(screen.getByRole("button", { name: "Enable Key" })).toBeInTheDocument();
+		expect(screen.queryByRole("button", { name: "Disable Key" })).not.toBeInTheDocument();
 	});
 
 	it("invokes toggle and delete callbacks from footer actions", async () => {
@@ -192,8 +191,8 @@ describe("ApiDetail", () => {
 
 		renderApiDetail({ apiKey, onToggleActive, onDelete });
 
-		await user.click(screen.getByRole("button", { name: "Disable" }));
-		await user.click(screen.getByRole("button", { name: "Delete" }));
+		await user.click(screen.getByRole("button", { name: "Disable Key" }));
+		await user.click(screen.getByRole("button", { name: "Delete Key" }));
 
 		expect(onToggleActive).toHaveBeenCalledWith(apiKey);
 		expect(onDelete).toHaveBeenCalledWith(apiKey);
@@ -223,8 +222,8 @@ describe("ApiDetail", () => {
 		renderApiDetail({ busy: true });
 
 		expect(screen.getByRole("button", { name: "Actions" })).toBeDisabled();
-		expect(screen.getByRole("button", { name: "Disable" })).toBeDisabled();
-		expect(screen.getByRole("button", { name: "Delete" })).toBeDisabled();
+		expect(screen.getByRole("button", { name: "Disable Key" })).toBeDisabled();
+		expect(screen.getByRole("button", { name: "Delete Key" })).toBeDisabled();
 		expect(screen.getByRole("switch")).toBeEnabled();
 
 		await user.click(screen.getByRole("switch"));

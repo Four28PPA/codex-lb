@@ -109,28 +109,29 @@ export function ApiDetail({
 	return (
 		<div
 			key={apiKey.id}
-			className="animate-fade-in-up space-y-4 rounded-xl border bg-card p-5"
+			className="animate-fade-in-up space-y-4 rounded-2xl border border-border/50 bg-gradient-to-b from-card/80 to-background p-5 shadow-[var(--shadow-sm)] backdrop-blur-sm"
 		>
 			<div className="flex items-start justify-between">
-				<h2 className="text-base font-semibold">{apiKey.name}</h2>
+				<h2 className="text-xl font-bold tracking-tight">{apiKey.name}</h2>
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
 						<Button
 							type="button"
-							size="icon-sm"
+							size="icon"
 							variant="ghost"
+							className="h-8 w-8 rounded-full"
 							disabled={busy}
 						>
 							<Ellipsis className="size-4" />
 							<span className="sr-only">Actions</span>
 						</Button>
 					</DropdownMenuTrigger>
-					<DropdownMenuContent align="end">
-						<DropdownMenuItem onClick={() => onEdit(apiKey)}>
+					<DropdownMenuContent align="end" className="rounded-xl">
+						<DropdownMenuItem onClick={() => onEdit(apiKey)} className="gap-2">
 							<Pencil className="size-4" />
 							Edit
 						</DropdownMenuItem>
-						<DropdownMenuItem onClick={() => onRegenerate(apiKey)}>
+						<DropdownMenuItem onClick={() => onRegenerate(apiKey)} className="gap-2">
 							<RefreshCw className="size-4" />
 							Regenerate
 						</DropdownMenuItem>
@@ -138,20 +139,21 @@ export function ApiDetail({
 				</DropdownMenu>
 			</div>
 
-			<div className="space-y-4 rounded-lg border bg-muted/30 p-4">
-				<div className="flex items-center justify-end gap-3">
-					<div className="flex items-center gap-3 text-[10px] text-muted-foreground">
+			<div className="relative overflow-hidden rounded-xl border border-border/40 bg-card/40 shadow-inner">
+				<div className="flex items-center justify-end gap-4 p-4 border-b border-border/30">
+					<div className="flex items-center gap-4 text-[11px] font-medium tracking-wide uppercase text-muted-foreground">
 						<span className="flex items-center gap-1.5">
 							Tokens
-							<span className="inline-block h-2 w-2 rounded-full bg-chart-2" />
+							<span className="inline-block h-2.5 w-2.5 rounded-full bg-chart-2 shadow-sm" />
 						</span>
 						<span className="flex items-center gap-1.5">
 							Cost
-							<span className="inline-block h-2 w-2 rounded-full bg-chart-1" />
+							<span className="inline-block h-2.5 w-2.5 rounded-full bg-chart-1 shadow-sm" />
 						</span>
 					</div>
-					<div className="flex items-center gap-1.5 rounded-md border px-2 py-1">
-						<span className="text-[10px]">Accumulated</span>
+					<div className="h-4 w-px bg-border/50" />
+					<div className="flex items-center gap-2">
+						<span className="text-[11px] font-medium tracking-wide uppercase text-muted-foreground">Accumulated</span>
 						<Switch
 							size="sm"
 							checked={showAccumulated}
@@ -160,9 +162,11 @@ export function ApiDetail({
 					</div>
 				</div>
 
-				{hasTrends && chartData && (
-					<ApiTrendChart cost={chartData.cost} tokens={chartData.tokens} />
-				)}
+				<div className="p-4">
+					{hasTrends && chartData && (
+						<ApiTrendChart cost={chartData.cost} tokens={chartData.tokens} />
+					)}
+				</div>
 			</div>
 
 			{usage7DayError ? (
@@ -176,41 +180,38 @@ export function ApiDetail({
 				allowUsageSummaryFallback={false}
 			/>
 
-			<div className="flex flex-wrap gap-2 border-t pt-4">
+			<div className="flex flex-wrap items-center gap-2 pt-2">
 				{apiKey.isActive ? (
 					<Button
 						type="button"
-						size="sm"
 						variant="outline"
-						className="h-8 gap-1.5 text-xs"
+						className="h-8 gap-2 rounded-lg border-border/60 hover:bg-muted/50"
 						onClick={() => onToggleActive(apiKey)}
 						disabled={busy}
 					>
-						<Ellipsis className="h-3.5 w-3.5" />
-						Disable
+						<Ellipsis className="size-3.5" />
+						Disable Key
 					</Button>
 				) : (
 					<Button
 						type="button"
-						size="sm"
-						className="h-8 gap-1.5 text-xs"
+						className="h-8 gap-2 rounded-lg"
 						onClick={() => onToggleActive(apiKey)}
 						disabled={busy}
 					>
-						<Play className="h-3.5 w-3.5" />
-						Enable
+						<Play className="size-3.5" />
+						Enable Key
 					</Button>
 				)}
 				<Button
 					type="button"
-					size="sm"
 					variant="destructive"
-					className="h-8 gap-1.5 text-xs"
+					className="h-8 gap-2 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500/20 hover:text-red-400 border border-red-500/20 shadow-none"
 					onClick={() => onDelete(apiKey)}
 					disabled={busy}
 				>
-					<Trash2 className="h-3.5 w-3.5" />
-					Delete
+					<Trash2 className="size-3.5" />
+					Delete Key
 				</Button>
 			</div>
 		</div>

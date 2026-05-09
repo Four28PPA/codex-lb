@@ -1,8 +1,7 @@
-import { ChevronDown, ChevronUp, Plus, Search, Upload } from "lucide-react";
+import { ChevronDown, ChevronUp, Plus, Upload } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -33,65 +32,47 @@ export function AccountList({
   onOpenImport,
   onOpenOauth,
 }: AccountListProps) {
-  const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [helpOpen, setHelpOpen] = useState(false);
 
   const filtered = useMemo(() => {
-    const needle = search.trim().toLowerCase();
     return accounts.filter((account) => {
       if (statusFilter !== "all" && account.status !== statusFilter) {
         return false;
       }
-      if (!needle) {
-        return true;
-      }
-      return (
-        account.email.toLowerCase().includes(needle) ||
-        account.accountId.toLowerCase().includes(needle) ||
-        account.planType.toLowerCase().includes(needle)
-      );
+      return true;
     });
-  }, [accounts, search, statusFilter]);
+  }, [accounts, statusFilter]);
 
   const duplicateAccountIds = useMemo(() => buildDuplicateAccountIdSet(accounts), [accounts]);
 
-  return (
-    <div className="space-y-3">
-      <div className="flex items-center gap-2">
-        <div className="relative min-w-0 flex-1">
-          <Search className="pointer-events-none absolute top-1/2 left-2.5 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground/60" aria-hidden />
-          <Input
-            placeholder="Search accounts..."
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-            className="h-8 pl-8"
-          />
-        </div>
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger size="sm" className="w-32 shrink-0">
-            <SelectValue placeholder="Status" />
-          </SelectTrigger>
-          <SelectContent>
-            {STATUS_FILTER_OPTIONS.map((option) => (
-              <SelectItem key={option} value={option}>
-                {option === "all" ? "All statuses" : formatSlug(option)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+	return (
+		<div className="space-y-4">
+			<div className="flex items-center gap-2">
+				<Select value={statusFilter} onValueChange={setStatusFilter}>
+					<SelectTrigger size="sm" className="w-full bg-card/40 border-border/40 hover:bg-card/60 transition-colors">
+						<SelectValue placeholder="Status" />
+					</SelectTrigger>
+					<SelectContent className="rounded-xl border-border/40 bg-card/95 backdrop-blur-md shadow-md">
+						{STATUS_FILTER_OPTIONS.map((option) => (
+							<SelectItem key={option} value={option} className="rounded-lg">
+								{option === "all" ? "All statuses" : formatSlug(option)}
+							</SelectItem>
+						))}
+					</SelectContent>
+				</Select>
+			</div>
 
-      <div className="flex gap-2">
-        <Button type="button" size="sm" variant="outline" onClick={onOpenImport} className="h-8 flex-1 gap-1.5 text-xs">
-          <Upload className="h-3.5 w-3.5" />
-          Import
-        </Button>
-        <Button type="button" size="sm" onClick={onOpenOauth} className="h-8 flex-1 gap-1.5 text-xs">
-          <Plus className="h-3.5 w-3.5" />
-          Add Account
-        </Button>
-      </div>
+			<div className="flex gap-2">
+				<Button type="button" size="sm" variant="outline" onClick={onOpenImport} className="h-8 flex-1 gap-1.5 text-xs rounded-lg border-border/40 bg-card/40 hover:bg-card/60 shadow-none">
+					<Upload className="h-3.5 w-3.5" />
+					Import
+				</Button>
+				<Button type="button" size="sm" onClick={onOpenOauth} className="h-8 flex-1 gap-1.5 text-xs rounded-lg shadow-none">
+					<Plus className="h-3.5 w-3.5" />
+					Add Account
+				</Button>
+			</div>
 
       <div>
         <Button

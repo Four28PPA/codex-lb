@@ -47,7 +47,7 @@ describe("AccountUsagePanel", () => {
     expect(screen.getByText("Weekly remaining")).toBeInTheDocument();
   });
 
-  it("renders mapped label for the known gated additional quota limit", () => {
+  it("does not surface low-value gated additional quota details", () => {
     const account = createAccountSummary({
       additionalQuotas: [
         {
@@ -65,10 +65,10 @@ describe("AccountUsagePanel", () => {
 
     render(<AccountUsagePanel account={account} trends={null} />);
 
-    expect(screen.getByText("Additional Quotas")).toBeInTheDocument();
-    expect(screen.getByText("GPT-5.3-Codex-Spark")).toBeInTheDocument();
-    expect(screen.getByText(/35% used/)).toBeInTheDocument();
-    expect(screen.getByText("Resets in 6d 13h")).toBeInTheDocument();
+    expect(screen.queryByText("Additional Quotas")).not.toBeInTheDocument();
+    expect(screen.queryByText("GPT-5.3-Codex-Spark")).not.toBeInTheDocument();
+    expect(screen.queryByText(/35% used/)).not.toBeInTheDocument();
+    expect(screen.queryByText("Resets in 6d 13h")).not.toBeInTheDocument();
   });
 
   it("renders request log usage summary when available", () => {
@@ -85,6 +85,6 @@ describe("AccountUsagePanel", () => {
 
     expect(screen.getByText("Request logs total")).toBeInTheDocument();
     expect(screen.getByText(/\$0\.13/)).toBeInTheDocument();
-    expect(screen.getByText(/51\.48K tok/)).toBeInTheDocument();
+    expect(screen.getByText(/51\.48K/)).toBeInTheDocument();
   });
 });

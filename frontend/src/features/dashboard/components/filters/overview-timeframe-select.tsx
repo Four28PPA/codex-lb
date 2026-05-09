@@ -16,22 +16,26 @@ function isOverviewTimeframe(value: string): value is OverviewTimeframe {
 export type OverviewTimeframeSelectProps = {
   value: OverviewTimeframe;
   onChange: (value: OverviewTimeframe) => void;
+  className?: string;
+  contentClassName?: string;
 };
 
 export function OverviewTimeframeSelect({
   value,
   onChange,
+  className,
+  contentClassName,
 }: OverviewTimeframeSelectProps) {
   return (
     <Select value={value} onValueChange={(next) => { if (isOverviewTimeframe(next)) onChange(next); }}>
       <SelectTrigger
         size="sm"
-        className="w-28"
+        className={className ?? "w-28"}
         aria-label="Overview timeframe"
       >
         <SelectValue placeholder="Overview" />
       </SelectTrigger>
-      <SelectContent align="end">
+      <SelectContent align="end" className={contentClassName}>
         <SelectItem value="1d">1d</SelectItem>
         <SelectItem value="7d">7d</SelectItem>
         <SelectItem value="30d">30d</SelectItem>
