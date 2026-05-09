@@ -70,17 +70,20 @@ describe("apis page integration", () => {
 
 		expect(await screen.findByRole("heading", { name: "Updated from APIs page" })).toBeInTheDocument();
 
-		await user.click(screen.getByRole("button", { name: "Disable Key" }));
-		expect(await screen.findByRole("button", { name: "Enable Key" })).toBeInTheDocument();
-
 		await user.click(screen.getByRole("button", { name: "Actions" }));
+		await user.click(screen.getByRole("menuitem", { name: "Disable key" }));
+		
+		await user.click(screen.getByRole("button", { name: "Actions" }));
+		expect(await screen.findByRole("menuitem", { name: "Enable key" })).toBeInTheDocument();
+
 		await user.click(screen.getByRole("menuitem", { name: "Regenerate" }));
 
 		const regeneratedDialog = await screen.findByRole("dialog", { name: "API key created" });
 		expect(within(regeneratedDialog).getByText(/sk-test-regenerated-key_1/)).toBeInTheDocument();
 		await user.click(getDialogFooterClose(regeneratedDialog));
 
-		await user.click(screen.getByRole("button", { name: "Delete Key" }));
+		await user.click(screen.getByRole("button", { name: "Actions" }));
+		await user.click(screen.getByRole("menuitem", { name: "Delete key" }));
 		const confirmDialog = await screen.findByRole("alertdialog", { name: "Delete API key" });
 		await user.click(within(confirmDialog).getByRole("button", { name: "Delete" }));
 

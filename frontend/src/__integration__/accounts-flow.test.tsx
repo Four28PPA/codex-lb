@@ -19,16 +19,17 @@ describe("accounts flow integration", () => {
     await user.click(screen.getByText("secondary@example.com"));
     expect(await screen.findAllByText("Access")).toHaveLength(2);
 
-    const resumeButton = screen.queryByRole("button", { name: "Resume" });
-    if (resumeButton) {
-      await user.click(resumeButton);
+    await user.click(screen.getByRole("button", { name: "Actions" }));
+    const resumeMenuItem = screen.queryByRole("menuitem", { name: "Resume account" });
+    if (resumeMenuItem) {
+      await user.click(resumeMenuItem);
       await waitFor(() => {
-        expect(screen.getByRole("button", { name: "Pause" })).toBeInTheDocument();
+        expect(screen.queryByRole("menuitem", { name: "Resume account" })).not.toBeInTheDocument();
       });
     } else {
-      await user.click(screen.getByRole("button", { name: "Pause" }));
+      await user.click(screen.getByRole("menuitem", { name: "Pause account" }));
       await waitFor(() => {
-        expect(screen.getByRole("button", { name: "Resume" })).toBeInTheDocument();
+        expect(screen.queryByRole("menuitem", { name: "Pause account" })).not.toBeInTheDocument();
       });
     }
   });

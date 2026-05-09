@@ -151,8 +151,10 @@ describe("ApiDetail", () => {
 		expect(toggle).toBeChecked();
 	});
 
-	it("shows enable action for inactive keys and disable action for active keys", () => {
-		const { rerender } = renderWithProviders(
+	it("shows enable action for inactive keys and disable action for active keys", async () => {
+		const user = userEvent.setup();
+		
+		const { unmount } = renderWithProviders(
 			<ApiDetail
 				apiKey={createApiKey({ isActive: true })}
 				trends={null}
@@ -164,10 +166,13 @@ describe("ApiDetail", () => {
 			/>,
 		);
 
-		expect(screen.getByRole("button", { name: "Disable Key" })).toBeInTheDocument();
-		expect(screen.queryByRole("button", { name: "Enable Key" })).not.toBeInTheDocument();
+		await user.click(screen.getByRole("button", { name: "Actions" }));
+		expect(screen.getByRole("menuitem", { name: "Disable key" })).toBeInTheDocument();
+		expect(screen.queryByRole("menuitem", { name: "Enable key" })).not.toBeInTheDocument();
 
-		rerender(
+		unmount();
+
+		renderWithProviders(
 			<ApiDetail
 				apiKey={createApiKey({ isActive: false })}
 				trends={null}
@@ -179,8 +184,9 @@ describe("ApiDetail", () => {
 			/>,
 		);
 
-		expect(screen.getByRole("button", { name: "Enable Key" })).toBeInTheDocument();
-		expect(screen.queryByRole("button", { name: "Disable Key" })).not.toBeInTheDocument();
+		await user.click(screen.getByRole("button", { name: "Actions" }));
+		expect(screen.getByRole("menuitem", { name: "Enable key" })).toBeInTheDocument();
+		expect(screen.queryByRole("menuitem", { name: "Disable key" })).not.toBeInTheDocument();
 	});
 
 	it("invokes toggle and delete callbacks from footer actions", async () => {
@@ -191,8 +197,11 @@ describe("ApiDetail", () => {
 
 		renderApiDetail({ apiKey, onToggleActive, onDelete });
 
-		await user.click(screen.getByRole("button", { name: "Disable Key" }));
-		await user.click(screen.getByRole("button", { name: "Delete Key" }));
+		await user.click(screen.getByRole("button", { name: "Actions" }));
+		await user.click(screen.getByRole("menuitem", { name: "Disable key" }));
+		
+		await user.click(screen.getByRole("button", { name: "Actions" }));
+		await user.click(screen.getByRole("menuitem", { name: "Delete key" }));
 
 		expect(onToggleActive).toHaveBeenCalledWith(apiKey);
 		expect(onDelete).toHaveBeenCalledWith(apiKey);
@@ -222,8 +231,6 @@ describe("ApiDetail", () => {
 		renderApiDetail({ busy: true });
 
 		expect(screen.getByRole("button", { name: "Actions" })).toBeDisabled();
-		expect(screen.getByRole("button", { name: "Disable Key" })).toBeDisabled();
-		expect(screen.getByRole("button", { name: "Delete Key" })).toBeDisabled();
 		expect(screen.getByRole("switch")).toBeEnabled();
 
 		await user.click(screen.getByRole("switch"));

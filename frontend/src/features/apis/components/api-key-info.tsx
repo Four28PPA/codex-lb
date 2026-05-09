@@ -53,19 +53,19 @@ export function ApiKeyInfo({
 				Key Details
 			</h3>
 			
-			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+			<div className="flex flex-wrap gap-3">
 				{/* Top Row: Basic Info */}
-				<div className="flex flex-col gap-1 rounded-xl border border-border/40 bg-card/40 p-3 shadow-inner">
+				<div className="flex-1 min-w-[140px] flex flex-col gap-1 rounded-xl border border-border/40 bg-card/40 p-3 shadow-inner">
 					<span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Prefix</span>
 					<span className="font-mono text-xs font-bold tracking-tight">{apiKey.keyPrefix}</span>
 				</div>
 				
-				<div className="flex flex-col gap-1 rounded-xl border border-border/40 bg-card/40 p-3 shadow-inner">
+				<div className="flex-1 min-w-[140px] flex flex-col gap-1 rounded-xl border border-border/40 bg-card/40 p-3 shadow-inner">
 					<span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Models</span>
 					<span className="text-xs font-bold tracking-tight">{models}</span>
 				</div>
 
-				<div className="flex flex-col gap-1 rounded-xl border border-border/40 bg-card/40 p-3 shadow-inner">
+				<div className="flex-1 min-w-[140px] flex flex-col gap-1 rounded-xl border border-border/40 bg-card/40 p-3 shadow-inner">
 					<span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Expiry</span>
 					<span
 						className={cn(
@@ -78,25 +78,22 @@ export function ApiKeyInfo({
 				</div>
 
 				{/* Optional Middle Row: Enforcements */}
-				{enforcedModel || enforcedEffort ? (
-					<>
-						{enforcedModel ? (
-							<div className="flex flex-col gap-1 rounded-xl border border-border/40 bg-card/40 p-3 shadow-inner">
-								<span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Enforced Model</span>
-								<span className="font-mono text-xs font-bold tracking-tight">{enforcedModel}</span>
-							</div>
-						) : null}
-						{enforcedEffort ? (
-							<div className="flex flex-col gap-1 rounded-xl border border-border/40 bg-card/40 p-3 shadow-inner">
-								<span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Enforced Effort</span>
-								<span className="text-xs font-bold tracking-tight">{enforcedEffort}</span>
-							</div>
-						) : null}
-					</>
+				{enforcedModel ? (
+					<div className="flex-1 min-w-[140px] flex flex-col gap-1 rounded-xl border border-border/40 bg-card/40 p-3 shadow-inner">
+						<span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Enforced Model</span>
+						<span className="font-mono text-xs font-bold tracking-tight">{enforcedModel}</span>
+					</div>
+				) : null}
+				
+				{enforcedEffort ? (
+					<div className="flex-1 min-w-[140px] flex flex-col gap-1 rounded-xl border border-border/40 bg-card/40 p-3 shadow-inner">
+						<span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Enforced Effort</span>
+						<span className="text-xs font-bold tracking-tight">{enforcedEffort}</span>
+					</div>
 				) : null}
 
 				{/* Usage */}
-				<div className="md:col-span-2 lg:col-span-3 flex flex-col gap-1 rounded-xl border border-border/40 bg-card/40 p-3 shadow-inner">
+				<div className="w-full flex flex-col gap-1 rounded-xl border border-border/40 bg-card/40 p-3 shadow-inner">
 					<span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Usage</span>
 					<div className="tabular-nums">
 						{hasUsage ? (
@@ -126,7 +123,7 @@ export function ApiKeyInfo({
 				</div>
 
 				{/* Limits Section */}
-				<div className="md:col-span-2 lg:col-span-3 flex flex-col gap-3 rounded-xl border border-border/40 bg-card/40 p-4 shadow-inner">
+				<div className="w-full flex flex-col gap-3 rounded-xl border border-border/40 bg-card/40 p-4 shadow-inner">
 					<div className="flex items-center justify-between">
 						<span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Limits</span>
 						<span className="text-[11px] font-bold tabular-nums text-muted-foreground">

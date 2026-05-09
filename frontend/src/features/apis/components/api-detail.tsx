@@ -3,6 +3,7 @@ import {
 	KeyRound,
 	Pencil,
 	Play,
+	Pause,
 	RefreshCw,
 	Trash2,
 } from "lucide-react";
@@ -135,6 +136,23 @@ export function ApiDetail({
 							<RefreshCw className="size-4" />
 							Regenerate
 						</DropdownMenuItem>
+						<DropdownMenuItem onClick={() => onToggleActive(apiKey)} className="gap-2">
+							{apiKey.isActive ? (
+								<>
+									<Pause className="size-4" />
+									Disable key
+								</>
+							) : (
+								<>
+									<Play className="size-4" />
+									Enable key
+								</>
+							)}
+						</DropdownMenuItem>
+						<DropdownMenuItem onClick={() => onDelete(apiKey)} className="gap-2 text-red-500 focus:text-red-500 focus:bg-red-500/10">
+							<Trash2 className="size-4" />
+							Delete key
+						</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>
 			</div>
@@ -179,41 +197,6 @@ export function ApiDetail({
 				usageMessage={usageMessage}
 				allowUsageSummaryFallback={false}
 			/>
-
-			<div className="flex flex-wrap items-center gap-2 pt-2">
-				{apiKey.isActive ? (
-					<Button
-						type="button"
-						variant="outline"
-						className="h-8 gap-2 rounded-lg border-border/60 hover:bg-muted/50"
-						onClick={() => onToggleActive(apiKey)}
-						disabled={busy}
-					>
-						<Ellipsis className="size-3.5" />
-						Disable Key
-					</Button>
-				) : (
-					<Button
-						type="button"
-						className="h-8 gap-2 rounded-lg"
-						onClick={() => onToggleActive(apiKey)}
-						disabled={busy}
-					>
-						<Play className="size-3.5" />
-						Enable Key
-					</Button>
-				)}
-				<Button
-					type="button"
-					variant="destructive"
-					className="h-8 gap-2 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500/20 hover:text-red-400 border border-red-500/20 shadow-none"
-					onClick={() => onDelete(apiKey)}
-					disabled={busy}
-				>
-					<Trash2 className="size-3.5" />
-					Delete Key
-				</Button>
-			</div>
 		</div>
 	);
 }
