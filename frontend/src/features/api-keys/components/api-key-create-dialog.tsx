@@ -124,37 +124,39 @@ export function ApiKeyCreateDialog({ open, busy, onOpenChange, onSubmit }: ApiKe
                     />
                   </div>
 
-                  <div className="space-y-1.5">
-                    <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Enforced reasoning</label>
-                    <Select value={enforcedReasoningEffort} onValueChange={setEnforcedReasoningEffort}>
-                      <SelectTrigger className="h-9 bg-background/50 border-border/40 shadow-inner focus-visible:bg-background transition-colors">
-                        <SelectValue placeholder="None" />
-                      </SelectTrigger>
-                      <SelectContent className="rounded-xl border-border/40 shadow-md">
-                        <SelectItem value="none" className="rounded-lg">None</SelectItem>
-                        <SelectItem value="minimal" className="rounded-lg">Minimal</SelectItem>
-                        <SelectItem value="low" className="rounded-lg">Low</SelectItem>
-                        <SelectItem value="medium" className="rounded-lg">Medium</SelectItem>
-                        <SelectItem value="high" className="rounded-lg">High</SelectItem>
-                        <SelectItem value="xhigh" className="rounded-lg">XHigh</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Enforced reasoning</label>
+                      <Select value={enforcedReasoningEffort} onValueChange={setEnforcedReasoningEffort}>
+                        <SelectTrigger className="h-9 bg-background/50 border-border/40 shadow-inner focus-visible:bg-background transition-colors">
+                          <SelectValue placeholder="None" />
+                        </SelectTrigger>
+                        <SelectContent className="rounded-xl border-border/40 shadow-md">
+                          <SelectItem value="none" className="rounded-lg">None</SelectItem>
+                          <SelectItem value="minimal" className="rounded-lg">Minimal</SelectItem>
+                          <SelectItem value="low" className="rounded-lg">Low</SelectItem>
+                          <SelectItem value="medium" className="rounded-lg">Medium</SelectItem>
+                          <SelectItem value="high" className="rounded-lg">High</SelectItem>
+                          <SelectItem value="xhigh" className="rounded-lg">XHigh</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
 
-                  <div className="space-y-1.5">
-                    <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Enforced service tier</label>
-                    <Select value={enforcedServiceTier} onValueChange={setEnforcedServiceTier}>
-                      <SelectTrigger className="h-9 bg-background/50 border-border/40 shadow-inner focus-visible:bg-background transition-colors">
-                        <SelectValue placeholder="None" />
-                      </SelectTrigger>
-                      <SelectContent className="rounded-xl border-border/40 shadow-md">
-                        <SelectItem value="none" className="rounded-lg">None</SelectItem>
-                        <SelectItem value="auto" className="rounded-lg">Auto</SelectItem>
-                        <SelectItem value="default" className="rounded-lg">Default</SelectItem>
-                        <SelectItem value="priority" className="rounded-lg">Priority</SelectItem>
-                        <SelectItem value="flex" className="rounded-lg">Flex</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <div className="space-y-1.5">
+                      <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Enforced tier</label>
+                      <Select value={enforcedServiceTier} onValueChange={setEnforcedServiceTier}>
+                        <SelectTrigger className="h-9 bg-background/50 border-border/40 shadow-inner focus-visible:bg-background transition-colors">
+                          <SelectValue placeholder="None" />
+                        </SelectTrigger>
+                        <SelectContent className="rounded-xl border-border/40 shadow-md">
+                          <SelectItem value="none" className="rounded-lg">None</SelectItem>
+                          <SelectItem value="auto" className="rounded-lg">Auto</SelectItem>
+                          <SelectItem value="default" className="rounded-lg">Default</SelectItem>
+                          <SelectItem value="priority" className="rounded-lg">Priority</SelectItem>
+                          <SelectItem value="flex" className="rounded-lg">Flex</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
 
                   <div className="space-y-1.5">
