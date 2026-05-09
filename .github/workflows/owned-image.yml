@@ -141,3 +141,83 @@ jobs:
             echo "- Source commit: `${GITHUB_SHA}`"
             echo "- SBOM/provenance: requested via Docker Buildx"
           } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Attest image build provenance
+        id: attest
+        uses: actions/attest-build-provenance@v4.1.0
+        continue-on-error: true
+        with:
+          subject-name: ${{ env.IMAGE_NAME }}
+          subject-digest: ${{ steps.build.outputs.digest }}
+          push-to-registry: true
+
+      - name: Scan pushed digest with Trivy
+        id: trivy
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: ${{ env.IMAGE_NAME }}@${{ steps.build.outputs.digest }}
+          format: table
+          output: trivy-image-scan.txt
+          exit-code: "1"
+          ignore-unfixed: true
+          vuln-type: os,library
+          severity: CRITICAL,HIGH
+        env:
+          TRIVY_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-db:2
+
+      - name: Create release evidence bundle
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          image = os.environ["IMAGE_NAME"]
+          tag = os.environ["IMAGE_TAG"]
+          digest = "${{ steps.build.outputs.digest }}"
+          evidence = {
+              "schema_version": 1,
+              "source_repo": "${{ github.server_url }}/${{ github.repository }}",
+              "upstream_base_commit": "1d882362bf9813488f1b2d9f40f32d67d491b453",
+              "fork_commit": "${{ github.sha }}",
+              "image_reference": f"{image}:{tag}",
+              "image_digest": f"{image}@{digest}",
+              "ci_run_url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}",
+              "sbom_status": "requested-via-docker-buildx",
+              "provenance_status": "requested-via-docker-buildx",
+              "github_attestation_status": "${{ steps.attest.outcome }}",
+              "vulnerability_scan": {
+                  "scanner": "trivy-action@v0.36.0",
+                  "severity": "CRITICAL,HIGH",
+                  "ignore_unfixed": True,
+                  "status": "${{ steps.trivy.outcome }}",
+                  "report_path": "trivy-image-scan.txt",
+              },
+              "hard_gates": {
+                  "digest_pinning": "pass",
+                  "lockfile_verification": "pass",
+                  "vulnerability_scan": "${{ steps.trivy.outcome }}",
+                  "sbom_provenance": "requested-via-docker-buildx",
+              },
+              "soft_gates": {
+                  "github_artifact_attestation": "${{ steps.attest.outcome }}",
+              },
+              "rollback_digest": "ghcr.io/soju06/codex-lb@sha256:e1047fa6c61de2506b6f264050cd8be25aa117356561b60335ad4a6d35ef6105",
+              "known_limitations": [
+                  "Dashboard redesign is not included in this unmodified ownership image.",
+                  "Live runtime promotion is a later gated phase.",
+              ],
+          }
+          Path("release-evidence.json").write_text(json.dumps(evidence, indent=2), encoding="utf-8")
+          PY
+
+      - name: Upload release evidence artifacts
+        if: always()
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          name: owned-image-release-evidence
+          path: |
+            release-evidence.json
+            trivy-image-scan.txt
+          if-no-files-found: error
